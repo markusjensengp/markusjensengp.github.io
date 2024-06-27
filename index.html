@@ -508,12 +508,20 @@
                                         Therefore there are a lot of features added to the car.
                                     </p>
                                     <p class="game-text">
-                                        <Span class="highlight">Car features: </Span></br>
-                                        -ooga </br>
-                                        -ooga </br>
-                                        -ooga </br>
-                                        -ooga </br>
-                                        -ooga </br>
+                                        <Span class="highlight">Some of the features: </Span></br>
+                                        -Togglable ABS </br>
+                                        -Adjustable Traction Crontrol </br>
+                                        -Anti-rollbars with adjustable stiffness </br>
+                                        -Gearbox simulation with adjustable gear ratios</br>
+                                        -Adjustable automatic gearbox values (shift up/down RPM, shift time) </br>
+                                        -Adjustable engine values (max/min RPM, torque curve) </br>
+                                        -Torque curve depending on RPM </br>
+                                        -RPM depending on wheel angular rotation </br>
+                                        -Differential gear ratio </br>
+                                        -Realistic suspension using UE5 physics constraints </br>
+                                        -Selectable drivetrain (RWD, FWD, AWD) </br>
+                                        -Visible and gameplay affecting damage </br>
+
                                     </p>
                                     <p class="game-text">
                                         Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugiat doloribus
@@ -558,10 +566,12 @@
                             </p>
                         </div>
 
-                        <!-- <div class="portfolio-top">
-                            <a class="button" href="https://silver-heart-media.itch.io/driveback-san-juego"
-                                style="margin: 32px 0px" target="_blank">Check it out on itch!</a>
-                        </div> -->
+                        <button onclick="toggleCodeSection()" style="margin-top: 10px;">Show Code</button>
+                        
+                        <!-- Code Section -->
+                        <pre id="code-section" style="display:none; background-color: #f4f4f4; padding: 10px; border: 1px solid #ddd;">
+                            // Add your code here
+                        </pre>
 
                         <hr style="width: 85vw; margin: 64px;">
                     </div>
@@ -712,7 +722,7 @@
                 <div class="content-wrapper">
                     <div class="header">
                         <div class="links">
-                            <a class="link" href="https://www.linkedin.com/in/cs-gd/" target="_blank"
+                            <a class="link" href="https://www.linkedin.com/in/markus-jensen-287799310/" target="_blank"
                                 title="LinkedIn"><span class="sr-only">Markus Jensen LinkedIn account</span>
                                 <svg class="svg-inline--fa fa-linkedin link-icon" aria-hidden="true" focusable="false"
                                     data-prefix="fab" data-icon="linkedin" role="img" xmlns="http://www.w3.org/2000/svg"
@@ -804,6 +814,15 @@
             var page = searchParams.get("page");
             if (page) popState({ state: { page } })
             else document.body.classList.add('isHome')
+
+            function toggleCodeSection() {
+                var codeSection = document.getElementById('code-section');
+                if (codeSection.style.display === 'none') {
+                    codeSection.style.display = 'block';
+                } else {
+                    codeSection.style.display = 'none';
+                }
+            }
         </script>
 </body>
 

@@ -228,6 +228,33 @@ body.modal-active {
     }
 }
 
+button {
+    background-color: #c095da;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #b084c7;
+}
+
+pre {
+    display: none;
+    background-color: #f4f4f4;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 10px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
 h2 {
     font-size: 1.5rem;
     font-weight: 700;
