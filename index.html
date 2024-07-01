@@ -3,7 +3,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <meta property="og:title" content="Game Programmer Portfolio - Markus Jensen" />
@@ -18,6 +18,7 @@
 
     <title>Markus Jensen | Portfolio</title>
     <link href="style.css" rel=" stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
     <link rel="icon" href="favicon.ico" />
     <link rel="icon" href="icon_tmp.png">
     <script src="https://kit.fontawesome.com/4bbade72d1.js" crossorigin="anonymous"></script>
@@ -507,53 +508,113 @@
                                         evolving it once I had completed the previous task.
                                         Therefore there are a lot of features added to the car.
                                     </p>
-                                    <p class="game-text">
-                                        <Span class="highlight">Some of the features: </Span></br>
-                                        -Togglable ABS </br>
-                                        -Adjustable Traction Crontrol </br>
-                                        -Anti-rollbars with adjustable stiffness </br>
-                                        -Gearbox simulation with adjustable gear ratios</br>
-                                        -Adjustable automatic gearbox values (shift up/down RPM, shift time) </br>
-                                        -Adjustable engine values (max/min RPM, torque curve) </br>
-                                        -Torque curve depending on RPM </br>
-                                        -RPM depending on wheel angular rotation </br>
-                                        -Differential gear ratio </br>
-                                        -Realistic suspension using UE5 physics constraints </br>
-                                        -Selectable drivetrain (RWD, FWD, AWD) </br>
-                                        -Visible and gameplay affecting damage </br>
+                                    <p class="highlight">Added features: </p>
+                                    <p class="game-text">-Togglable ABS </p>
+                                    <pre id="code-section">
+                                        <code class="language-cpp">
+// AbsEnabled is a blueprint editable variable for easy toggling
+if( AbsEnabled && abs( ConnectedWheelRPM / 60.0f * KMHperWheelRPS - VehicleSpeed ) > 0.1f )
+{
+    CAxisFL->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
+    CAxisFR->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
+    CAxisRL->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
+    CAxisRR->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
+}
+                                        </code> 
+                                    </pre>
+                                    <p class="game-text">-Adjustable Traction Crontrol </p>
+                                    <pre id="code-section">
+                                        <code class="language-cpp">
+// Only check for traction control at high speed (enables burnouts and donuts)
+if( VehicleSpeed > 30.0f )
+    // If wheels are spinning faster than the car is moving, do not proceed
+    if( ConnectedWheelRPM / 60.0f * KMHperWheelRPS - VehicleSpeed > 10.0f / ( 10.0f * TractionControl + 0.0000001f ) )
+        return;
 
-                                    </p>
-                                    <p class="game-text">
-                                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugiat doloribus
-                                        aspernatur sunt omnis ea magni repellendus eaque assumenda laborum perspiciatis
-                                        molestiae animi nulla praesentium reiciendis fugit cupiditate, sed corporis id!
-                                    </p>
-                                </div>
-                                <div>
-                                    <img style="max-width: 400px; max-height: 300px;" class="game-image"
-                                        src="images/Loading.png">
-                                    <p
-                                        style="line-height: 0; font-size: small; font-style: italic; margin-left: 50px; margin-top: 10px;">
-                                        Image discription.</p>
-                                </div>
-                            </div>
+if( CurrentRPM < MaxRPM )
+    ApplyTorque();
+                                        </code> 
+                                    </pre>
+                                    <p class="game-text">-Anti-rollbars with adjustable stiffness </p>
+                                    <pre id="code-section">
+                                        <code class="language-cpp">
+void APlayerCar::HandleBodyRoll()
+{
+    CSuspensionFL->GetConstraint().Get()->GetConstraintForce( SuspForceFL, SuspAngForceFL );
+    CSuspensionFR->GetConstraint().Get()->GetConstraintForce( SuspForceFR, SuspAngForceFR );
+    CSuspensionFL->GetConstraint().Get()->GetConstraintForce( SuspForceRL, SuspAngForceRL );
+    CSuspensionFR->GetConstraint().Get()->GetConstraintForce( SuspForceRR, SuspAngForceRR );
 
-                            <div class="game-information">
-                                <div>
-                                    <p class="game-text">
-                                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum magnam,
-                                        voluptate ab
-                                        doloribus esse pariatur dolorum unde, natus non deleniti ut nobis? Minus sunt
-                                        nihil
-                                        optio voluptate a, ea ratione.
-                                    </p>
+    // If right or left suspension force is less than its counterpart, 
+    // set this force to its counterparts multiplied by 0-1 to even out
+
+    if( SuspForceFL.Z < SuspForceFR.Z )
+        SuspForceFL = SuspForceFR * FrontRollBarStiffness;
+    else if( SuspForceFR.Z < SuspForceFL.Z )
+        SuspForceFR = SuspForceFL * FrontRollBarStiffness;
+    
+    if( SuspForceRL.Z < SuspForceRR.Z )
+        SuspForceRL = SuspForceRR * RearRollBarStiffness;
+    else if( SuspForceRR.Z < SuspForceRL.Z )
+        SuspForceRR = SuspForceRL * RearRollBarStiffness;
+}
+                                        </code> 
+                                    </pre>
+                                    <p class="game-text">-Gearbox simulation with adjustable gear ratios</p>
+                                    <pre id="code-section">
+                                        <code class="language-cpp">
+printf("hell")
+                                        </code> 
+                                    </pre>
+                                    <p class="game-text">-Adjustable automatic gearbox values (shift up/down RPM, shift time) </p>
+                                    <pre id="code-section">
+                                        <code class="language-cpp">
+printf("hell")
+                                        </code> 
+                                    </pre>
+                                    <p class="game-text">-Adjustable engine values (max/min RPM, torque curve)</p>
+                                    <pre id="code-section">
+                                        <code class="language-cpp">
+printf("hell")
+                                        </code> 
+                                    </pre>
+                                    <p class="game-text">-Torque curve depending on RPM </p>
+                                    <pre id="code-section">
+                                        <code class="language-cpp">
+printf("hell")
+                                        </code> 
+                                    </pre>
+                                    <p class="game-text">-RPM depending on wheel angular rotation </p>
+                                    <pre id="code-section">
+                                        <code class="language-cpp">
+printf("hell")
+                                        </code> 
+                                    </pre>
+                                    <p class="game-text">-Differential gear ratio </p>
+                                    <pre id="code-section">
+                                        <code class="language-cpp">
+printf("hell")
+                                        </code> 
+                                    </pre>
+                                    <p class="game-text">-Realistic suspension using UE5 physics constraints </p>
+                                    <pre id="code-section">
+                                        <code class="language-cpp">
+printf("hell")
+                                        </code> 
+                                    </pre>
+                                    <p class="game-text">-Selectable drivetrain (RWD, FWD, AWD) </p>
+                                    <pre id="code-section">
+                                        <code class="language-cpp">
+printf("hell")
+                                        </code> 
+                                    </pre>
+                                    <p class="game-text">-Gameplay affecting damage </p>
+                                    <pre id="code-section">
+                                        <code class="language-cpp">
+printf("hell")
+                                        </code> 
+                                    </pre>
                                 </div>
-                            </div>
-                            <div>
-                                <img style="max-width: 400px; max-height: 300px;" class="game-image"
-                                    src="images/Loading.png">
-                                <p style="line-height: 0; font-size: small; font-style: italic; margin-top: 10px;">
-                                    Image discription.</p>
                             </div>
                         </div>
 
@@ -565,13 +626,6 @@
                                 molestias harum, error quod animi quia assumenda?
                             </p>
                         </div>
-
-                        <button onclick="toggleCodeSection()" style="margin-top: 10px;">Show Code</button>
-                        
-                        <!-- Code Section -->
-                        <pre id="code-section" style="display:none; background-color: #f4f4f4; padding: 10px; border: 1px solid #ddd;">
-                            // Add your code here
-                        </pre>
 
                         <hr style="width: 85vw; margin: 64px;">
                     </div>
@@ -775,6 +829,7 @@
             </footer>
         </div>
         <div class="goHomeButton"><button data-section="home">Home</button></div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
         <script>
             document.querySelectorAll('.section-trigger, .goHomeButton button').forEach(el => {
                 el.addEventListener('click', (e) => {
@@ -815,14 +870,9 @@
             if (page) popState({ state: { page } })
             else document.body.classList.add('isHome')
 
-            function toggleCodeSection() {
-                var codeSection = document.getElementById('code-section');
-                if (codeSection.style.display === 'none') {
-                    codeSection.style.display = 'block';
-                } else {
-                    codeSection.style.display = 'none';
-                }
-            }
+            document.addEventListener('DOMContentLoaded', function () {
+                hljs.highlightAll();
+                });
         </script>
 </body>
 
