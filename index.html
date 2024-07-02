@@ -506,47 +506,43 @@
                                     <p class="game-text">
                                         Since my only responsibility was the car controller, I had time to continue
                                         evolving it once I had completed the previous task.
-                                        Therefore there are a lot of features added to the car.
+                                        Therefore there are a lot of features added to the car controller.
                                     </p>
                                     <p class="highlight">Added features: </p>
                                     <p class="game-text">-Togglable ABS </p>
-                                    <pre id="code-section">
-                                        <code class="language-cpp">
-// AbsEnabled is a blueprint editable variable for easy toggling
+                                    <pre id="code-section"><code class="language-cpp">
 if( AbsEnabled && abs( ConnectedWheelRPM / 60.0f * KMHperWheelRPS - VehicleSpeed ) > 0.1f )
 {
-    CAxisFL->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
-    CAxisFR->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
-    CAxisRL->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
-    CAxisRR->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
+    // These parameters are reset to "engine breaking strength" each frame
+    AxisFL->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
+    AxisFR->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
+    AxisRL->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
+    AxisRR->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
 }
-                                        </code> 
-                                    </pre>
+                                    </code></pre>
                                     <p class="game-text">-Adjustable Traction Crontrol </p>
-                                    <pre id="code-section">
-                                        <code class="language-cpp">
+                                    <pre id="code-section"><code class="language-cpp">
 // Only check for traction control at high speed (enables burnouts and donuts)
 if( VehicleSpeed > 30.0f )
-    // If wheels are spinning faster than the car is moving, do not proceed
+    // If wheels are spinning more than 0-10km/h (depending on set traction control value) faster than the car is moving, 
+    // do not proceed
     if( ConnectedWheelRPM / 60.0f * KMHperWheelRPS - VehicleSpeed > 10.0f / ( 10.0f * TractionControl + 0.0000001f ) )
         return;
 
 if( CurrentRPM < MaxRPM )
     ApplyTorque();
-                                        </code> 
-                                    </pre>
+                                    </code></pre>
                                     <p class="game-text">-Anti-rollbars with adjustable stiffness </p>
-                                    <pre id="code-section">
-                                        <code class="language-cpp">
+                                    <pre id="code-section"><code class="language-cpp">
 void APlayerCar::HandleBodyRoll()
 {
-    CSuspensionFL->GetConstraint().Get()->GetConstraintForce( SuspForceFL, SuspAngForceFL );
-    CSuspensionFR->GetConstraint().Get()->GetConstraintForce( SuspForceFR, SuspAngForceFR );
-    CSuspensionFL->GetConstraint().Get()->GetConstraintForce( SuspForceRL, SuspAngForceRL );
-    CSuspensionFR->GetConstraint().Get()->GetConstraintForce( SuspForceRR, SuspAngForceRR );
+    SuspensionFL->GetConstraint().Get()->GetConstraintForce( SuspForceFL, SuspAngForceFL );
+    SuspensionFR->GetConstraint().Get()->GetConstraintForce( SuspForceFR, SuspAngForceFR );
+    SuspensionFL->GetConstraint().Get()->GetConstraintForce( SuspForceRL, SuspAngForceRL );
+    SuspensionFR->GetConstraint().Get()->GetConstraintForce( SuspForceRR, SuspAngForceRR );
 
     // If right or left suspension force is less than its counterpart, 
-    // set this force to its counterparts multiplied by 0-1 to even out
+    // set this force to its counterparts multiplied by 0-1 (stiffness) to even out
 
     if( SuspForceFL.Z < SuspForceFR.Z )
         SuspForceFL = SuspForceFR * FrontRollBarStiffness;
@@ -558,62 +554,99 @@ void APlayerCar::HandleBodyRoll()
     else if( SuspForceRR.Z < SuspForceRL.Z )
         SuspForceRR = SuspForceRL * RearRollBarStiffness;
 }
-                                        </code> 
-                                    </pre>
+                                    </code></pre>
                                     <p class="game-text">-Gearbox simulation with adjustable gear ratios</p>
-                                    <pre id="code-section">
-                                        <code class="language-cpp">
-printf("hell")
-                                        </code> 
-                                    </pre>
+                                    <pre id="code-section"><code class="language-cpp">
+// Multiplies engine torque output with gear ratio to calculate torque which is applied to wheels
+CurrentTorque = TorqueCurve->GetFloatValue( CurrentRPM ) * GearRatios[ CurrentGear ] * ThrottleValue;
+
+// Torque application, example on rear left wheel
+WheelRL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( WheelRL->GetComponentTransform(), FVector( 0,  CurrentTorque, 0 ) ), NAME_None, true );
+
+// Shift gear function
+void APlayerCar::ShiftGears(float Value)
+{
+    if( Value < 0 )
+    {
+        CurrentGear += Value;	
+    }
+    else
+    {
+        // Used later in Tick function
+        ShiftingGears = true;
+        ShiftingTimer = 0.0f;
+        NextGear      = CurrentGear + 1;
+    }
+}
+// Tick
+if( ShiftingGears )
+{
+    ShiftingTimer += DeltaTime;
+    if( ShiftingTimer > TimeBetweenGears )
+    {
+        CurrentGear = NextGear;
+        ShiftingGears = false;
+    }
+    return;
+}
+
+// Updates the engines rpm depending on the fastest spinning connected wheel,
+// differential axle ratio and selected gear
+if( CurrentGear > 0 )
+    TargetRPM = ConnectedWheelRPM * AxleRatio * GearRatios[ CurrentGear ];
+else if( CurrentGear < 0 )
+    TargetRPM = ConnectedWheelRPM * AxleRatio * abs( GearRatios[ 0 ] );
+
+if( TargetRPM < IdleRPM )
+    TargetRPM = IdleRPM;
+
+CurrentRPM += static_cast< int >( ( TargetRPM - CurrentRPM ) / 5.0f );
+
+// Shift up
+if( CurrentRPM >= ShiftUpRPM && CurrentGear < 5 && CurrentGear > 0 && abs( ConnectedWheelRPM / 60.0f * KMHperWheelRPS - VehicleSpeed ) < 5.0f )
+{
+    ShiftGears( 1 );
+    return;
+}
+// Shift down
+if( CurrentRPM < ShiftDownRPM && CurrentGear > 1 )
+    ShiftGears( -1 );
+// Shift to neutral
+if( ConnectedWheelRPM < 5.0f && CurrentGear != 0 && !ThrottleValue )
+    ShiftGears( -CurrentGear );
+                                    </code></pre>
                                     <p class="game-text">-Adjustable automatic gearbox values (shift up/down RPM, shift time) </p>
-                                    <pre id="code-section">
-                                        <code class="language-cpp">
+                                    <pre id="code-section"><code class="language-cpp">
 printf("hell")
-                                        </code> 
-                                    </pre>
+                                    </code></pre>
                                     <p class="game-text">-Adjustable engine values (max/min RPM, torque curve)</p>
-                                    <pre id="code-section">
-                                        <code class="language-cpp">
+                                    <pre id="code-section"><code class="language-cpp">
 printf("hell")
-                                        </code> 
-                                    </pre>
+                                    </code></pre>
                                     <p class="game-text">-Torque curve depending on RPM </p>
-                                    <pre id="code-section">
-                                        <code class="language-cpp">
+                                    <pre id="code-section"><code class="language-cpp">
 printf("hell")
-                                        </code> 
-                                    </pre>
+                                    </code></pre>
                                     <p class="game-text">-RPM depending on wheel angular rotation </p>
-                                    <pre id="code-section">
-                                        <code class="language-cpp">
+                                    <pre id="code-section"><code class="language-cpp">
 printf("hell")
-                                        </code> 
-                                    </pre>
+                                    </code></pre>
                                     <p class="game-text">-Differential gear ratio </p>
-                                    <pre id="code-section">
-                                        <code class="language-cpp">
+                                    <pre id="code-section"><code class="language-cpp">
 printf("hell")
-                                        </code> 
-                                    </pre>
+                                    </code></pre>
                                     <p class="game-text">-Realistic suspension using UE5 physics constraints </p>
-                                    <pre id="code-section">
-                                        <code class="language-cpp">
+                                    <pre id="code-section"><code class="language-cpp">
 printf("hell")
-                                        </code> 
-                                    </pre>
+                                    </code></pre>
                                     <p class="game-text">-Selectable drivetrain (RWD, FWD, AWD) </p>
-                                    <pre id="code-section">
-                                        <code class="language-cpp">
+                                    <pre id="code-section"><code class="language-cpp">
 printf("hell")
-                                        </code> 
-                                    </pre>
+                                    </code></pre>
                                     <p class="game-text">-Gameplay affecting damage </p>
-                                    <pre id="code-section">
-                                        <code class="language-cpp">
+                                    <pre id="code-section"><code class="language-cpp">
 printf("hell")
-                                        </code> 
-                                    </pre>
+                                    </code></pre>
                                 </div>
                             </div>
                         </div>
