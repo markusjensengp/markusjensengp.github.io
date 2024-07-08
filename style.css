@@ -1612,9 +1612,8 @@ body.isHome .goHomeButton {
 .game-information .game-text {
     color: #ffffff;
     margin: 0;
-    margin-top: 20px;
-    margin-bottom: 5px;
-    font-size: 1.5rem;
+    margin-top: 10px;
+    font-size: 1.35rem;
 }
 
 /* Styles for smaller screens */
@@ -1627,7 +1626,7 @@ body.isHome .goHomeButton {
 /* Styles for medium screens */
 @media(min-width: 601px) and (max-width: 1024px) {
     .game-information .game-text {
-        font-size: 1.25rem;
+        font-size: 1.15rem;
     }
 }
 
@@ -1635,14 +1634,15 @@ body.isHome .goHomeButton {
 @media(min-width: 1025px) {
     .game-information .game-text {
         font-weight: 300;
-        font-size: 1.5rem;
+        font-size: 1.35rem;
     }
 }
 
 .highlight {
+    text-align: left;
     font-size: 2rem;
     font-weight: bold;
-    color: #c095da;
+    color: #f2e0fd;
     margin-top: 20px;
 }
 

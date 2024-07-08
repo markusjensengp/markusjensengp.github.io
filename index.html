@@ -18,7 +18,7 @@
 
     <title>Markus Jensen | Portfolio</title>
     <link href="style.css" rel=" stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/shades-of-purple.min.css">
     <link rel="icon" href="favicon.ico" />
     <link rel="icon" href="icon_tmp.png">
     <script src="https://kit.fontawesome.com/4bbade72d1.js" crossorigin="anonymous"></script>
@@ -234,7 +234,7 @@
                         </button>
                         <!-- END CARD DriveBack-->
 
-                        <!-- START CARD Gesture recognizer-->
+                        <!-- START CARD GestureRecognizer-->
                         <button type="button" class="project-card section-trigger" data-section="GestureRecognizer">
                             <section>
                                 <div class="project-video" :before>
@@ -293,7 +293,7 @@
                                 </p>
                             </section>
                         </button>
-                        <!-- END CARD Gesture recognizer-->
+                        <!-- END CARD GestureRecognizer-->
 
                         <!-- START CARD BestLaidSchemes-->
                         <button type="button" class="project-card section-trigger" data-section="BestLaidSchemes">
@@ -487,14 +487,12 @@
                             <h2 class="gameDesch2">My Contribution</h2>
                             <div class="game-information">
                                 <p class="game-text">
-                                    The larger team size and a more advanced game engine that we used for this project,
-                                    allowed me to
-                                    really focus on what I like to do, which is gameplay programming. And I had the
-                                    opportunity to focus on the
-                                    car controller for the entirety of the project.
+                                    The larger team size and a more advanced game engine that we used for this project, allowed me to really focus on what I
+                                    like to do, which is gameplay programming. And I had the opportunity to focus on the car controller for the entirety of
+                                    the project.
                                     </br>
-                                    My car controller is a physically simulated car controller with arcade vehicle
-                                    features.
+                                    My car controller is a physically simulated car controller with arcade vehicle features, with a many adjustable
+                                    variables and components to enable the user to modify their car in any way they want.
                                 </p>
                             </div>
                         </div>
@@ -508,62 +506,16 @@
                                         evolving it once I had completed the previous task.
                                         Therefore there are a lot of features added to the car controller.
                                     </p>
-                                    <p class="highlight">Added features: </p>
-                                    <p class="game-text">-Togglable ABS </p>
+                                    
+                                    <p class="highlight">Gearbox simulation with adjustable gear ratios</p>
+                                    <p class="game-text">Gear ratios are handled by the array GearRatios, and are used in every appearance of engine RPM or
+                                        torque.
+                                    </p>
                                     <pre id="code-section"><code class="language-cpp">
-if( AbsEnabled && abs( ConnectedWheelRPM / 60.0f * KMHperWheelRPS - VehicleSpeed ) > 0.1f )
-{
-    // These parameters are reset to "engine breaking strength" each frame
-    AxisFL->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
-    AxisFR->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
-    AxisRL->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
-    AxisRR->SetAngularDriveParams( 0.0f, BreakStrength * -ThrottleValue, 0.0f );
-}
-                                    </code></pre>
-                                    <p class="game-text">-Adjustable Traction Crontrol </p>
-                                    <pre id="code-section"><code class="language-cpp">
-// Only check for traction control at high speed (enables burnouts and donuts)
-if( VehicleSpeed > 30.0f )
-    // If wheels are spinning more than 0-10km/h (depending on set traction control value) faster than the car is moving, 
-    // do not proceed
-    if( ConnectedWheelRPM / 60.0f * KMHperWheelRPS - VehicleSpeed > 10.0f / ( 10.0f * TractionControl + 0.0000001f ) )
-        return;
+// Gear ratios for gears; reverse and 1-5
+UPROPERTY( EditAnywhere, BlueprintReadOnly ) TArray< float > GearRatios = { 0, 0, 0, 0, 0, 0 };
 
-if( CurrentRPM < MaxRPM )
-    ApplyTorque();
-                                    </code></pre>
-                                    <p class="game-text">-Anti-rollbars with adjustable stiffness </p>
-                                    <pre id="code-section"><code class="language-cpp">
-void APlayerCar::HandleBodyRoll()
-{
-    SuspensionFL->GetConstraint().Get()->GetConstraintForce( SuspForceFL, SuspAngForceFL );
-    SuspensionFR->GetConstraint().Get()->GetConstraintForce( SuspForceFR, SuspAngForceFR );
-    SuspensionFL->GetConstraint().Get()->GetConstraintForce( SuspForceRL, SuspAngForceRL );
-    SuspensionFR->GetConstraint().Get()->GetConstraintForce( SuspForceRR, SuspAngForceRR );
-
-    // If right or left suspension force is less than its counterpart, 
-    // set this force to its counterparts multiplied by 0-1 (stiffness) to even out
-
-    if( SuspForceFL.Z < SuspForceFR.Z )
-        SuspForceFL = SuspForceFR * FrontRollBarStiffness;
-    else if( SuspForceFR.Z < SuspForceFL.Z )
-        SuspForceFR = SuspForceFL * FrontRollBarStiffness;
-    
-    if( SuspForceRL.Z < SuspForceRR.Z )
-        SuspForceRL = SuspForceRR * RearRollBarStiffness;
-    else if( SuspForceRR.Z < SuspForceRL.Z )
-        SuspForceRR = SuspForceRL * RearRollBarStiffness;
-}
-                                    </code></pre>
-                                    <p class="game-text">-Gearbox simulation with adjustable gear ratios</p>
-                                    <pre id="code-section"><code class="language-cpp">
-// Multiplies engine torque output with gear ratio to calculate torque which is applied to wheels
-CurrentTorque = TorqueCurve->GetFloatValue( CurrentRPM ) * GearRatios[ CurrentGear ] * ThrottleValue;
-
-// Torque application, example on rear left wheel
-WheelRL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( WheelRL->GetComponentTransform(), FVector( 0,  CurrentTorque, 0 ) ), NAME_None, true );
-
-// Shift gear function
+// Shift gear function, Value > 0 for up-shifting
 void APlayerCar::ShiftGears(float Value)
 {
     if( Value < 0 )
@@ -578,7 +530,8 @@ void APlayerCar::ShiftGears(float Value)
         NextGear      = CurrentGear + 1;
     }
 }
-// Tick
+
+// In Tick
 if( ShiftingGears )
 {
     ShiftingTimer += DeltaTime;
@@ -601,7 +554,13 @@ if( TargetRPM < IdleRPM )
     TargetRPM = IdleRPM;
 
 CurrentRPM += static_cast< int >( ( TargetRPM - CurrentRPM ) / 5.0f );
-
+                                    </code></pre>
+                                    <p class="highlight">Adjustable automatic gearbox values (shift up/down RPM, shift time) </p>
+                                    <p class="game-text">Shift up and down RPM values, as well as the time between gear shifts, are managed by the variables
+                                        ShiftUpRPM, ShiftDownRPM, and TimeBetweenGears. The code checks the current RPM and initiates a gear shift if
+                                        necessary.
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
 // Shift up
 if( CurrentRPM >= ShiftUpRPM && CurrentGear < 5 && CurrentGear > 0 && abs( ConnectedWheelRPM / 60.0f * KMHperWheelRPS - VehicleSpeed ) < 5.0f )
 {
@@ -614,50 +573,225 @@ if( CurrentRPM < ShiftDownRPM && CurrentGear > 1 )
 // Shift to neutral
 if( ConnectedWheelRPM < 5.0f && CurrentGear != 0 && !ThrottleValue )
     ShiftGears( -CurrentGear );
+
+// Shifting
+ShiftingTimer += DeltaTime;
+if( ShiftingTimer > TimeBetweenGears )
+{
+    CurrentGear = NextGear;
+    ShiftingGears = false;
+}
                                     </code></pre>
-                                    <p class="game-text">-Adjustable automatic gearbox values (shift up/down RPM, shift time) </p>
+                                    <p class="highlight">Adjustable engine values (max/min RPM, torque curve)</p>
+                                    <p class="game-text">To ensure that the engine RPM does not get unrealistically high or low, variables MaxRPM and
+                                        IdleRPM were added and made into UPROPERTY for easy adjustments. The torque curve was also added as a UPROPERTY for
+                                        easy adjustments.
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+UPROPERTY( EditAnywhere, BlueprintReadOnly ) UCurveFloat* TorqueCurve;
+UPROPERTY( EditAnywhere, BlueprintReadOnly ) int MaxRPM = 8000;
+UPROPERTY( EditAnywhere, BlueprintReadOnly ) int IdleRPM = 800;
+
+if( CurrentRPM < MaxRPM )
+    ApplyTorque();
+
+if( TargetRPM < IdleRPM )
+    TargetRPM = IdleRPM;
+                                    </code></pre>
+                                    <p class="highlight">Torque curve depending on RPM </p>
+                                    <p class="game-text">The torque applied to the wheels depends on the current RPM, which is determined by the torque
+                                        curve, multiplied by gear and axle ratios.
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+// Multiplies engine torque output with gear ratio to calculate torque which is applied to wheels
+CurrentTorque = TorqueCurve->GetFloatValue( CurrentRPM ) * GearRatios[ CurrentGear ] * AxleRatio * ThrottleValue;
+                                    </code></pre>
+                                    <p class="highlight">RPM depending on wheel angular rotation </p>
+                                    <p class="game-text">The RPM is calculated based on the angular velocity of the fastest spinning connected wheel, and
+                                        gear ratios in the EngineBrake function.
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+ConnectedWheelRPM = 0.0f;
+
+switch ( DriveTrain )
+{
+    ...
+    case EDriveTrain::RWD:
+    {
+        const float RLAngVel = abs( UKismetMathLibrary::InverseTransformDirection( CWheelRL->GetComponentTransform(), 
+                                    CWheelRL->GetPhysicsAngularVelocityInDegrees() ).Y ) / 360.0f * 60.0f;
+        const float RRAngVel = abs( UKismetMathLibrary::InverseTransformDirection( CWheelRR->GetComponentTransform(), 
+                                    CWheelRR->GetPhysicsAngularVelocityInDegrees() ).Y ) / 360.0f * 60.0f;
+        
+        // Sets ConnectedWheelRPM to the highest value of RLAngVel and RRAngVel
+        ConnectedWheelRPM = ( ConnectedWheelRPM > RLAngVel ) ?
+            ConnectedWheelRPM : RLAngVel;
+        
+        ConnectedWheelRPM = ( ConnectedWheelRPM > RRAngVel ) ?
+            ConnectedWheelRPM : RRAngVel;
+        break;
+    }
+    ...
+}
+
+TargetRPM = ConnectedWheelRPM * AxleRatio * GearRatios[ CurrentGear ];
+                                    </code></pre>
+                                    <p class="highlight">Anti-rollbars with adjustable stiffness </p>
+                                    <p class="game-text">The anti-rollbars are designed to counteract body roll during cornering by balancing the forces between
+                                        the left and right suspension components. The code compares the forces on the left and right sides for both the front and rear
+                                        suspensions. If the force on one side is less than its counterpart on the opposite side, it adjusts the force by
+                                        multiplying the counterpart's force with a stiffness factor (ranging from 0 to 1). This helps even out the suspension
+                                        force and reduces body roll.
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+void APlayerCar::HandleBodyRoll()
+{
+    SuspensionFL->GetConstraint().Get()->GetConstraintForce( SuspForceFL, SuspAngForceFL );
+    SuspensionFR->GetConstraint().Get()->GetConstraintForce( SuspForceFR, SuspAngForceFR );
+    SuspensionFL->GetConstraint().Get()->GetConstraintForce( SuspForceRL, SuspAngForceRL );
+    SuspensionFR->GetConstraint().Get()->GetConstraintForce( SuspForceRR, SuspAngForceRR );
+
+    // If right or left suspension force is less than its counterpart, 
+    // set this force to its counterparts multiplied by 0-1 (stiffness) 
+    // to even out suspension force and counter body roll
+
+    if( SuspForceFL.Z < SuspForceFR.Z )
+        SuspForceFL = SuspForceFR * FrontRollBarStiffness;
+    else if( SuspForceFR.Z < SuspForceFL.Z )
+        SuspForceFR = SuspForceFL * FrontRollBarStiffness;
+    
+    if( SuspForceRL.Z < SuspForceRR.Z )
+        SuspForceRL = SuspForceRR * RearRollBarStiffness;
+    else if( SuspForceRR.Z < SuspForceRL.Z )
+        SuspForceRR = SuspForceRL * RearRollBarStiffness;
+}
+                                    </code></pre>
+                                    <p class="highlight">Togglable ABS </p>
+                                    <p class="game-text">The ABS can be toggled through the variable AbsEnabled. When the
+                                        throttle value is negative (braking) and ABS is enabled, the code checks if the difference between the connected
+                                        wheel RPM and the vehicle speed is significant. If it is, the braking force is applied. If not, the braking 
+                                        force stays as it is to prevent wheel lock-up.
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+if( AbsEnabled && abs( ConnectedWheelRPM / 60.0f * KMHperWheelRPS - VehicleSpeed ) > 0.1f )
+{
+    // These parameters are reset to "engine braking strength" each frame
+    AxisFL->SetAngularDriveParams( 0.0f, BrakeStrength * -ThrottleValue, 0.0f );
+    AxisFR->SetAngularDriveParams( 0.0f, BrakeStrength * -ThrottleValue, 0.0f );
+    AxisRL->SetAngularDriveParams( 0.0f, BrakeStrength * -ThrottleValue, 0.0f );
+    AxisRR->SetAngularDriveParams( 0.0f, BrakeStrength * -ThrottleValue, 0.0f );
+}
+                                    </code></pre>
+                                    <p class="highlight">Adjustable Traction Crontrol </p>
+                                    <p class="game-text">Traction control is implied in the throttle handling section. The code checks if the difference
+                                        between the connected wheel RPM and vehicle speed is within a certain limit. If not, the torque is not applied to
+                                        the wheels.
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+// Only check for traction control at high speed (enables burnouts and donuts)
+if( VehicleSpeed > 30.0f )
+    if( ConnectedWheelRPM / 60.0f * KMHperWheelRPS - VehicleSpeed > 10.0f / ( 10.0f * TractionControl + 0.0000001f ) )
+        return;
+
+if( CurrentRPM < MaxRPM )
+    ApplyTorque();
+                                    </code></pre>
+                                    <p class="highlight">Differential gear ratio </p>
+                                    <p class="game-text">To achieve a more realistic conversion of engine torque to wheel torque, a differential gear ratio,
+                                        known as the AxleRatio, was included. This variable ensures a realistic torque curve, resulting in accurate wheel
+                                        torque.
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+// AxleRatio used to affect wheel torque
+CurrentTorque = TorqueCurve->GetFloatValue( CurrentRPM ) * GearRatios[ CurrentGear ] * AxleRatio * ThrottleValue;
+
+// AxleRatio used to affect engine RPM while engine braking
+TargetRPM = ConnectedWheelRPM * AxleRatio * GearRatios[ CurrentGear ];
+                                    </code></pre>
+                                    <p class="highlight">Realistic suspension using UE5 physics constraints </p>
+                                    <p class="game-text">Using Unreal Engine 5's physics constraints to set up suspension allowed me to create a fairly
+                                        realistic suspension setup with two physics constraints for each wheel. One for connecting a wheel hub to the body
+                                        so hub and wheel can travel up and down, and one to connect the wheel to the hub to enable the wheel to spin.
+                                    </p>
                                     <pre id="code-section"><code class="language-cpp">
 printf("hell")
                                     </code></pre>
-                                    <p class="game-text">-Adjustable engine values (max/min RPM, torque curve)</p>
+                                    <p class="highlight">Selectable drivetrain (RWD, FWD, AWD) </p>
+                                    <p class="game-text">Selecting drivetrain is easily done with the variable DriveTrain through Blueprints.
+                                    </p>
                                     <pre id="code-section"><code class="language-cpp">
-printf("hell")
+void APlayerCar::ApplyTorque()
+{
+    if( !CRoot->IsSimulatingPhysics() )
+        return;
+
+    switch ( DriveTrain )
+    {
+    case EDriveTrain::AWD:
+        {
+            // Multiplies torque by 0.45 for the front wheels and 0.55 for the rear to distribute
+            // torque for all wheels
+            CWheelFL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                CWheelFL->GetComponentTransform(), FVector( 0,  CurrentTorque * 0.45f, 0 ) ), NAME_None, true );
+            CWheelFR->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                CWheelFR->GetComponentTransform(), FVector( 0, -CurrentTorque * 0.45f, 0 ) ), NAME_None, true );
+            CWheelRL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                CWheelRL->GetComponentTransform(), FVector( 0,  CurrentTorque * 0.55f, 0 ) ), NAME_None, true );
+            CWheelRR->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                CWheelRR->GetComponentTransform(), FVector( 0, -CurrentTorque * 0.55f, 0 ) ), NAME_None, true );
+            break;
+        }
+    case EDriveTrain::RWD:
+        {
+            CWheelRL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                CWheelRL->GetComponentTransform(), FVector( 0,  CurrentTorque, 0 ) ), NAME_None, true );
+            CWheelRR->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                CWheelRR->GetComponentTransform(), FVector( 0, -CurrentTorque, 0 ) ), NAME_None, true );
+            break;
+        }
+    case EDriveTrain::FWD:
+        {
+            CWheelFL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                CWheelFL->GetComponentTransform(), FVector( 0,  CurrentTorque, 0 ) ), NAME_None, true );
+            CWheelFR->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                CWheelFR->GetComponentTransform(), FVector( 0, -CurrentTorque, 0 ) ), NAME_None, true );			
+            break;
+        }
+    }
+}
                                     </code></pre>
-                                    <p class="game-text">-Torque curve depending on RPM </p>
+                                    <p class="highlight">Gameplay affecting damage </p>
+                                    <p class="game-text">Using a team members visual damage component, damage is applied to the wheels depending on what part of the car is damaged
+                                    </p>
                                     <pre id="code-section"><code class="language-cpp">
-printf("hell")
-                                    </code></pre>
-                                    <p class="game-text">-RPM depending on wheel angular rotation </p>
-                                    <pre id="code-section"><code class="language-cpp">
-printf("hell")
-                                    </code></pre>
-                                    <p class="game-text">-Differential gear ratio </p>
-                                    <pre id="code-section"><code class="language-cpp">
-printf("hell")
-                                    </code></pre>
-                                    <p class="game-text">-Realistic suspension using UE5 physics constraints </p>
-                                    <pre id="code-section"><code class="language-cpp">
-printf("hell")
-                                    </code></pre>
-                                    <p class="game-text">-Selectable drivetrain (RWD, FWD, AWD) </p>
-                                    <pre id="code-section"><code class="language-cpp">
-printf("hell")
-                                    </code></pre>
-                                    <p class="game-text">-Gameplay affecting damage </p>
-                                    <pre id="code-section"><code class="language-cpp">
-printf("hell")
+// DamageThreshold is a UPROPERTY to limit when wheels start taking damage
+if( CRoot->m_health_hood_L < DamageThreshold ) 
+{
+    WheelDmgRotFL += MaxDamageAngle * ( ( 100.0f - CRoot->m_health_hood_L ) / 100.0f );
+}
+
+DamageSinValue += DeltaTime * VehicleSpeed;
+
+if( WheelDmgRotFL )
+    // Adds or subtracts damage to create a wobbling effect
+    WheelDmgRotFL += WobbleValue * sin( DamageSinValue ) * abs( WheelDmgRotFL / MaxDamageAngle ) ;
+
+// Handled in HandleSteering function
+CSuspensionFL->SetAngularOrientationTarget( FRotator( 0, Angle + WheelDmgRotFL, 0 ) );
                                     </code></pre>
                                 </div>
                             </div>
                         </div>
 
-                        <h2>Conclusion</h2>
-                        <div class="game-information">
-                            <p class="game-text">
-                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Deleniti ratione reprehenderit
-                                hic quasi quibusdam, laboriosam consequuntur? Odio a unde labore eos culpa veniam
-                                molestias harum, error quod animi quia assumenda?
-                            </p>
+                        <div class=gamedesc>
+                            <h2 class="gameDesch2">Conclusion</h2>
+                            <div class="game-information">
+                                <p class="game-text">
+                                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Deleniti ratione reprehenderit
+                                    hic quasi quibusdam, laboriosam consequuntur? Odio a unde labore eos culpa veniam
+                                    molestias harum, error quod animi quia assumenda?
+                                </p>
+                            </div>
                         </div>
 
                         <hr style="width: 85vw; margin: 64px;">
@@ -790,19 +924,163 @@ printf("hell")
                             </div>
                         </div>
 
-                        <h2>Conclusion</h2>
-                        <div class="game-information">
-                            <p class="game-text">
-                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Deleniti ratione reprehenderit
-                                hic quasi quibusdam, laboriosam consequuntur? Odio a unde labore eos culpa veniam
-                                molestias harum, error quod animi quia assumenda?
-                            </p>
+                        <div class=gamedesc>
+                            <h2 class="gameDesch2">Conclusion</h2>
+                            <div class="game-information">
+                                <p class="game-text">
+                                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Deleniti ratione reprehenderit
+                                    hic quasi quibusdam, laboriosam consequuntur? Odio a unde labore eos culpa veniam
+                                    molestias harum, error quod animi quia assumenda?
+                                </p>
+                            </div>
                         </div>
 
                         <hr style="width: 85vw; margin: 64px;">
                     </div>
                 </section>
                 <!-- END SECTION GestureRecognizer -->
+
+                <!-- START SECTION BestLaidSchemes-->
+                <section class="page-section section--BestLaidSchemes">
+                    <div class="portfolio-header">
+                        <h2 id="portfolio">
+                            Gesture Recognizer
+                        </h2>
+                    </div>
+                    <div class="portfolio-top">
+                        <div class="content-placeholder" :before>
+                            <video playsinline loop autoplay preload="metadata" muted>
+                                <source src="videos/DriveBackSanJuegoGameplay.mp4" type="video/mp4">
+                                Your browser does not support the video tag or the file format of this video.
+                            </video>
+                        </div>
+                        <h2>Gameplay</h2>
+                    </div>
+                    <div class="projects">
+                        <div class="projects-info-container">
+
+                            <img style="height: 450px; margin: 8px;" src="images/DriveBackSanJuegoPoster.png">
+
+                            <section class="project-card">
+
+                                <h3>Project Info</h3>
+
+                                <ul>
+                                    <li>
+                                        <svg class="svg-inline--fa fa-user list-icon" aria-hidden="true"
+                                            focusable="false" data-prefix="fas" data-icon="user" role="img"
+                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                            <path class="" fill="currentColor"
+                                                d="M224 256c70.7 0 128-57.31 128-128s-57.3-128-128-128C153.3 0 96 57.31 96 128S153.3 256 224 256zM274.7 304H173.3C77.61 304 0 381.6 0 477.3c0 19.14 15.52 34.67 34.66 34.67h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304z">
+                                            </path>
+                                        </svg>
+                                        Solo project
+                                    </li>
+                                    <li>
+                                        <svg class="svg-inline--fa fa-user list-icon" aria-hidden="true"
+                                            focusable="false" data-prefix="fas" data-icon="user" role="img"
+                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                            <path class="" fill="currentColor"
+                                                d="M256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512zM232 256C232 264 236 271.5 242.7 275.1L338.7 339.1C349.7 347.3 364.6 344.3 371.1 333.3C379.3 322.3 376.3 307.4 365.3 300L280 243.2V120C280 106.7 269.3 96 255.1 96C242.7 96 231.1 106.7 231.1 120L232 256z">
+                                            </path>
+                                        </svg>
+                                        Time frame: 4 Weeks
+                                    </li>
+                                    <li>
+                                        <svg class="svg-inline--fa fa-user list-icon" aria-hidden="true"
+                                            focusable="false" data-prefix="fas" data-icon="user" role="img"
+                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                            <path class="" fill="currentColor"
+                                                d="M331.8 224.1c28.29 0 54.88 10.99 74.86 30.97l19.59 19.59c40.01-17.74 71.25-53.3 81.62-96.65c5.725-23.92 5.34-47.08 .2148-68.4c-2.613-10.88-16.43-14.51-24.34-6.604l-68.9 68.9h-75.6V97.2l68.9-68.9c7.912-7.912 4.275-21.73-6.604-24.34c-21.32-5.125-44.48-5.51-68.4 .2148c-55.3 13.23-98.39 60.22-107.2 116.4C224.5 128.9 224.2 137 224.3 145l82.78 82.86C315.2 225.1 323.5 224.1 331.8 224.1zM384 278.6c-23.16-23.16-57.57-27.57-85.39-13.9L191.1 158L191.1 95.99l-127.1-95.99L0 63.1l96 127.1l62.04 .0077l106.7 106.6c-13.67 27.82-9.251 62.23 13.91 85.39l117 117.1c14.62 14.5 38.21 14.5 52.71-.0016l52.75-52.75c14.5-14.5 14.5-38.08-.0016-52.71L384 278.6zM227.9 307L168.7 247.9l-148.9 148.9c-26.37 26.37-26.37 69.08 0 95.45C32.96 505.4 50.21 512 67.5 512s34.54-6.592 47.72-19.78l119.1-119.1C225.5 352.3 222.6 329.4 227.9 307zM64 472c-13.25 0-24-10.75-24-24c0-13.26 10.75-24 24-24S88 434.7 88 448C88 461.3 77.25 472 64 472z">
+                                            </path>
+                                        </svg>
+                                        Engine: Unreal Engine 5
+                                    </li>
+                                    <li>
+                                        <svg class="svg-inline--fa fa-user list-icon" aria-hidden="true"
+                                            focusable="false" data-prefix="fas" data-icon="desktop" role="img"
+                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                            <path class="" fill="currentColor"
+                                                d="M528 0H48C21.49 0 0 21.49 0 48V384C0 410.5 21.49 432 48 432H240V480H176C167.2 480 160 487.2 160 496C160 504.8 167.2 512 176 512H400C408.8 512 416 504.8 416 496C416 487.2 408.8 480 400 480H336V432H528C554.5 432 576 410.5 576 384V48C576 21.49 554.5 0 528 0zM528 384H48V48H528V384z">
+                                            </path>
+                                        </svg>
+                                        Platform: PC
+                                    </li>
+                                </ul>
+                            </section>
+                            <section class="project-card">
+                                <h3>Project Summary</h3>
+                                I have made a multistroke gestrue recognizing algorithm, using the $1 algorithm as a
+                                base.
+                            </section>
+                        </div>
+
+                        <hr style="width: 85vw; margin: 32px;">
+
+                        <div class=gamedesc>
+                            <h2 class="gameDesch2">How I did it</h2>
+                            <div class="game-information">
+                                <div>
+                                    <p class="game-text">
+                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam numquam quod
+                                        incidunt eum, placeat sed, excepturi adipisci quo possimus nesciunt animi
+                                        commodi ipsum at suscipit porro ea et repellendus ab!
+                                    </p>
+                                    <p class="game-text">
+                                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Consectetur illum
+                                        maiores eius aperiam minima expedita voluptatum qui quod, numquam est amet
+                                        porro, deserunt aliquam nisi debitis cupiditate id, ullam voluptate.
+                                    </p>
+                                    <p class="game-text">
+                                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugiat doloribus
+                                        aspernatur sunt omnis ea magni repellendus eaque assumenda laborum perspiciatis
+                                        molestiae animi nulla praesentium reiciendis fugit cupiditate, sed corporis id!
+                                    </p>
+                                </div>
+                                <div>
+                                    <img style="max-width: 400px; max-height: 300px;" class="game-image"
+                                        src="images/Loading.png">
+                                    <p
+                                        style="line-height: 0; font-size: small; font-style: italic; margin-left: 50px; margin-top: 10px;">
+                                        Image discription.</p>
+                                </div>
+                            </div>
+
+                            <div class="game-information">
+                                <div>
+                                    <p class="game-text">
+                                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum magnam,
+                                        voluptate ab
+                                        doloribus esse pariatur dolorum unde, natus non deleniti ut nobis? Minus sunt
+                                        nihil
+                                        optio voluptate a, ea ratione.
+                                    </p>
+                                </div>
+                            </div>
+                            <div>
+                                <img style="max-width: 400px; max-height: 300px;" class="game-image"
+                                    src="images/Loading.png">
+                                <p style="line-height: 0; font-size: small; font-style: italic; margin-top: 10px;">
+                                    Image discription.</p>
+                            </div>
+                        </div>
+
+                        <div class=gamedesc>
+                            <h2 class="gameDesch2">Conclusion</h2>
+                            <div class="game-information">
+                                <p class="game-text">
+                                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Deleniti ratione reprehenderit
+                                    hic quasi quibusdam, laboriosam consequuntur? Odio a unde labore eos culpa veniam
+                                    molestias harum, error quod animi quia assumenda?
+                                </p>
+                            </div>
+                        </div>
+
+                        <hr style="width: 85vw; margin: 64px;">
+                    </div>
+                </section>
+                <!-- END SECTION BestLaidSchemes -->
+
             </div>
 
             <footer>
