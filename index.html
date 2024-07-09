@@ -491,8 +491,8 @@
                                     like to do, which is gameplay programming. And I had the opportunity to focus on the car controller for the entirety of
                                     the project.
                                     </br>
-                                    My car controller is a physically simulated car controller with arcade vehicle features, with a many adjustable
-                                    variables and components to enable the user to modify their car in any way they want.
+                                    My car controller is a physically simulated car controller with arcade vehicle features, with many adjustable
+                                    variables and components to enable the user to modify their car in almost any way they want.
                                 </p>
                             </div>
                         </div>
@@ -502,9 +502,9 @@
                             <div class="game-information">
                                 <div>
                                     <p class="game-text">
-                                        Since my only responsibility was the car controller, I had time to continue
-                                        evolving it once I had completed the previous task.
-                                        Therefore there are a lot of features added to the car controller.
+                                        Since my only responsibility was the car controller, I had time to continue evolving it once I had completed the feature
+                                        I was previously working on. Therefore there are a lot of features added to the car controller, considering the
+                                        timeframe we had.
                                     </p>
                                     
                                     <p class="highlight">Gearbox simulation with adjustable gear ratios</p>
@@ -584,7 +584,7 @@ if( ShiftingTimer > TimeBetweenGears )
                                     </code></pre>
                                     <p class="highlight">Adjustable engine values (max/min RPM, torque curve)</p>
                                     <p class="game-text">To ensure that the engine RPM does not get unrealistically high or low, variables MaxRPM and
-                                        IdleRPM were added and made into UPROPERTY for easy adjustments. The torque curve was also added as a UPROPERTY for
+                                        IdleRPM were added for easy adjustments. The torque curve was also added as a UPROPERTY for
                                         easy adjustments.
                                     </p>
                                     <pre id="code-section"><code class="language-cpp">
@@ -618,10 +618,10 @@ switch ( DriveTrain )
     ...
     case EDriveTrain::RWD:
     {
-        const float RLAngVel = abs( UKismetMathLibrary::InverseTransformDirection( CWheelRL->GetComponentTransform(), 
-                                    CWheelRL->GetPhysicsAngularVelocityInDegrees() ).Y ) / 360.0f * 60.0f;
-        const float RRAngVel = abs( UKismetMathLibrary::InverseTransformDirection( CWheelRR->GetComponentTransform(), 
-                                    CWheelRR->GetPhysicsAngularVelocityInDegrees() ).Y ) / 360.0f * 60.0f;
+        const float RLAngVel = abs( UKismetMathLibrary::InverseTransformDirection( WheelRL->GetComponentTransform(), 
+                                    WheelRL->GetPhysicsAngularVelocityInDegrees() ).Y ) / 360.0f * 60.0f;
+        const float RRAngVel = abs( UKismetMathLibrary::InverseTransformDirection( WheelRR->GetComponentTransform(), 
+                                    WheelRR->GetPhysicsAngularVelocityInDegrees() ).Y ) / 360.0f * 60.0f;
         
         // Sets ConnectedWheelRPM to the highest value of RLAngVel and RRAngVel
         ConnectedWheelRPM = ( ConnectedWheelRPM > RLAngVel ) ?
@@ -690,6 +690,7 @@ if( AbsEnabled && abs( ConnectedWheelRPM / 60.0f * KMHperWheelRPS - VehicleSpeed
                                     <pre id="code-section"><code class="language-cpp">
 // Only check for traction control at high speed (enables burnouts and donuts)
 if( VehicleSpeed > 30.0f )
+    // 	KMHperWheelRPS = WheelDiameter * Pi * 3.6
     if( ConnectedWheelRPM / 60.0f * KMHperWheelRPS - VehicleSpeed > 10.0f / ( 10.0f * TractionControl + 0.0000001f ) )
         return;
 
@@ -708,14 +709,6 @@ CurrentTorque = TorqueCurve->GetFloatValue( CurrentRPM ) * GearRatios[ CurrentGe
 // AxleRatio used to affect engine RPM while engine braking
 TargetRPM = ConnectedWheelRPM * AxleRatio * GearRatios[ CurrentGear ];
                                     </code></pre>
-                                    <p class="highlight">Realistic suspension using UE5 physics constraints </p>
-                                    <p class="game-text">Using Unreal Engine 5's physics constraints to set up suspension allowed me to create a fairly
-                                        realistic suspension setup with two physics constraints for each wheel. One for connecting a wheel hub to the body
-                                        so hub and wheel can travel up and down, and one to connect the wheel to the hub to enable the wheel to spin.
-                                    </p>
-                                    <pre id="code-section"><code class="language-cpp">
-printf("hell")
-                                    </code></pre>
                                     <p class="highlight">Selectable drivetrain (RWD, FWD, AWD) </p>
                                     <p class="game-text">Selecting drivetrain is easily done with the variable DriveTrain through Blueprints.
                                     </p>
@@ -731,30 +724,30 @@ void APlayerCar::ApplyTorque()
         {
             // Multiplies torque by 0.45 for the front wheels and 0.55 for the rear to distribute
             // torque for all wheels
-            CWheelFL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
-                CWheelFL->GetComponentTransform(), FVector( 0,  CurrentTorque * 0.45f, 0 ) ), NAME_None, true );
-            CWheelFR->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
-                CWheelFR->GetComponentTransform(), FVector( 0, -CurrentTorque * 0.45f, 0 ) ), NAME_None, true );
-            CWheelRL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
-                CWheelRL->GetComponentTransform(), FVector( 0,  CurrentTorque * 0.55f, 0 ) ), NAME_None, true );
-            CWheelRR->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
-                CWheelRR->GetComponentTransform(), FVector( 0, -CurrentTorque * 0.55f, 0 ) ), NAME_None, true );
+            WheelFL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                WheelFL->GetComponentTransform(), FVector( 0,  CurrentTorque * 0.45f, 0 ) ), NAME_None, true );
+            WheelFR->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                WheelFR->GetComponentTransform(), FVector( 0, -CurrentTorque * 0.45f, 0 ) ), NAME_None, true );
+            WheelRL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                WheelRL->GetComponentTransform(), FVector( 0,  CurrentTorque * 0.55f, 0 ) ), NAME_None, true );
+            WheelRR->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                WheelRR->GetComponentTransform(), FVector( 0, -CurrentTorque * 0.55f, 0 ) ), NAME_None, true );
             break;
         }
     case EDriveTrain::RWD:
         {
-            CWheelRL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
-                CWheelRL->GetComponentTransform(), FVector( 0,  CurrentTorque, 0 ) ), NAME_None, true );
-            CWheelRR->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
-                CWheelRR->GetComponentTransform(), FVector( 0, -CurrentTorque, 0 ) ), NAME_None, true );
+            WheelRL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                WheelRL->GetComponentTransform(), FVector( 0,  CurrentTorque, 0 ) ), NAME_None, true );
+            WheelRR->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                WheelRR->GetComponentTransform(), FVector( 0, -CurrentTorque, 0 ) ), NAME_None, true );
             break;
         }
     case EDriveTrain::FWD:
         {
-            CWheelFL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
-                CWheelFL->GetComponentTransform(), FVector( 0,  CurrentTorque, 0 ) ), NAME_None, true );
-            CWheelFR->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
-                CWheelFR->GetComponentTransform(), FVector( 0, -CurrentTorque, 0 ) ), NAME_None, true );			
+            WheelFL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                WheelFL->GetComponentTransform(), FVector( 0,  CurrentTorque, 0 ) ), NAME_None, true );
+            WheelFR->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                WheelFR->GetComponentTransform(), FVector( 0, -CurrentTorque, 0 ) ), NAME_None, true );			
             break;
         }
     }
@@ -777,7 +770,39 @@ if( WheelDmgRotFL )
     WheelDmgRotFL += WobbleValue * sin( DamageSinValue ) * abs( WheelDmgRotFL / MaxDamageAngle ) ;
 
 // Handled in HandleSteering function
-CSuspensionFL->SetAngularOrientationTarget( FRotator( 0, Angle + WheelDmgRotFL, 0 ) );
+SuspensionFL->SetAngularOrientationTarget( FRotator( 0, Angle + WheelDmgRotFL, 0 ) );
+                                    </code></pre>
+                                    <p class="highlight">Realistic suspension using UE5 physics constraints </p>
+                                    <p class="game-text">Using Unreal Engine 5's physics constraints to set up suspension allowed me to create a fairly
+                                        realistic suspension setup with two physics constraints for each wheel. One for connecting a wheel hub to the body
+                                        so hub and wheel can travel up and down, and one to connect the wheel to the hub to enable the wheel to spin.
+                                    </p>
+                                    <div class="game-information">
+                                        <div>
+                                            <img style="max-width: 400px; max-height: 300px;" class="game-image"
+                                                src="images/Loading.png">
+                                            <p
+                                                style="line-height: 0; font-size: small; font-style: italic; margin-left: 32px; margin-top: 10px; margin-bottom: 16px;">
+                                                Image discription.
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <img style="max-width: 400px; max-height: 300px;" class="game-image"
+                                                src="images/Loading.png">
+                                            <p
+                                                style="line-height: 0; font-size: small; font-style: italic; margin-left: 32px; margin-top: 10px; margin-bottom: 16px;">
+                                                Image discription.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <p class="game-text">Steering using physics constraints
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+// Calculates angle from input and vehicle speed, resulting in smoother turning during high speed
+Angle = SteeringValue * MaxSteeringAngle * ( 1 - VehicleSpeed / 125.0f );
+
+SuspensionFL->SetAngularOrientationTarget( FRotator( 0, Angle, 0 ) );
+SuspensionFR->SetAngularOrientationTarget( FRotator( 0, Angle, 0 ) );
                                     </code></pre>
                                 </div>
                             </div>
@@ -787,9 +812,17 @@ CSuspensionFL->SetAngularOrientationTarget( FRotator( 0, Angle + WheelDmgRotFL, 
                             <h2 class="gameDesch2">Conclusion</h2>
                             <div class="game-information">
                                 <p class="game-text">
-                                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Deleniti ratione reprehenderit
-                                    hic quasi quibusdam, laboriosam consequuntur? Odio a unde labore eos culpa veniam
-                                    molestias harum, error quod animi quia assumenda?
+                                    This project has given me so much. Since this was my first real project in Unreal Engine, I had to firstly learn about
+                                    the engine itself and how I can use it to my advantage, both the very simple essentials as well as the complex and
+                                    advanced features. Then I was completely in charge of creating a whole car controller, which was something that I had
+                                    never done anything remotely close to. It has been a big challange for me, from start to end, but the whole journey has
+                                    been educational for me and I have gained so many useful skills throughout this project.
+                                    </br>
+                                    </br>
+                                    I used to have a pretty focuesd path when creating my code, since almost all of my previous projects and features have
+                                    been my idea where I already had an approach to a solution made up. But for this project I had no idea what I was coming
+                                    into and how it would end up, so my code had to be pretty flexible in case my controller didn't satisfy the group, which
+                                    did happen. This has shown to be a very useful skill that I gained from this project.
                                 </p>
                             </div>
                         </div>

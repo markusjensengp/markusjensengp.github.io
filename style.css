@@ -1665,13 +1665,13 @@ game-information {
 
 .game-information .game-image {
     max-width: 300px;
-    margin: 0 auto 48px auto
+    margin: 16px;
 }
 
 @media(min-width: 768px) {
     .game-information .game-image {
         margin-bottom: 0;
-        margin-left: 48px;
+        margin-left: 32px;
     }
 }
 
