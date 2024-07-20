@@ -1054,6 +1054,7 @@ FMyPoint Gesture::Centroid( TArray< FMyPoint >& points )
                                         Translate function:
                                     </p>
                                     <pre id="code-section"><code class="language-cpp">
+// Moves shape to coordinates (0, 0)
 void Gesture::TranslateTo( TArray< FMyPoint >& points, FMyPoint centroid )
 {
     TArray< FMyPoint > old_points = points;
@@ -1074,7 +1075,11 @@ void Gesture::TranslateTo( TArray< FMyPoint >& points, FMyPoint centroid )
                                     <pre id="code-section"><code class="language-cpp">
 float Recognizer::PathDistance( const TArray< FMyPoint >& path_a, const TArray< FMyPoint >& path_b )
 {
+    // Number of points in the paths ( path_a and path_b have
+    // the same number of points since both are resampled )
     const int n = path_a.Num();
+
+    // Keeps track of which points in path_b are matched
     std::vector< bool > matched( n, false );
 
     float sum = 0.0f;
@@ -1082,6 +1087,8 @@ float Recognizer::PathDistance( const TArray< FMyPoint >& path_a, const TArray< 
     {
         int index = -1;
         float min_distance = FLT_MAX;
+
+        // Finds the closest point in path_b that has not been matched yet
         for( int j = 0; j < n; j++ )
         {
             if( !matched[ j ] )
@@ -1094,6 +1101,8 @@ float Recognizer::PathDistance( const TArray< FMyPoint >& path_a, const TArray< 
                 }
             }
         }
+
+        // Marks the point in path_b as matched and adds the smallest distance found to sum
         matched[ index ] = true;
         sum += min_distance;
     }
@@ -1109,6 +1118,7 @@ float Recognizer::DistanceAtAngle( const TArray< FMyPoint >& candidate_points, c
                                    const float& radians )
 {
     TArray< FMyPoint > new_points = candidate_points;
+    // Rotates the shape by the radians given by the golden section search
     Gesture::RotateBy( new_points, radians );
     return PathDistance( new_points, template_points );
 }
@@ -1134,7 +1144,7 @@ void Recognizer::GoldenSectionSearch( const float& a, const float& b, const TArr
                                     <pre id="code-section"><code class="language-cpp">
 float Recognizer::DistanceAtBestAngle( const TArray< FMyPoint >& candidate_points,
                                        const TArray< FMyPoint >& template_points, const float& from_angle,
-                                       const float& to_angle, const float& threshold )
+                                       const float& to_angle, const float& precision )
 {
     float current_from_angle = from_angle;
     float current_to_angle = to_angle;
@@ -1143,8 +1153,7 @@ float Recognizer::DistanceAtBestAngle( const TArray< FMyPoint >& candidate_point
     GoldenSectionSearch( current_from_angle, current_to_angle, candidate_points, template_points, x1, d1 );
     GoldenSectionSearch( current_to_angle, current_from_angle, candidate_points, template_points, x2, d1 );
 
-    // Continue narrowing the search range until the difference between bounds is less than the threshold
-    while( FMath::Abs( current_to_angle - current_from_angle ) > threshold )
+    while( FMath::Abs( current_to_angle - current_from_angle ) > precision )
     {
         // Update the bounds based on the results of the golden section search
         if( d1 < d2 )
@@ -1167,14 +1176,8 @@ float Recognizer::DistanceAtBestAngle( const TArray< FMyPoint >& candidate_point
         }
     }
 
+    // Return the smallest distance found
     return FMath::Min( d1, d2 );
-}
-
-void Recognizer::GoldenSectionSearch( const float& a, const float& b, const TArray< FMyPoint >& candidate_points,
-                    const TArray< FMyPoint >& template_points, float& x, float& f )
-{
-    x = phi * a + ( 1.0 - phi ) * b;
-    f = DistanceAtAngle( candidate_points, template_points, x );
 }
                                     </code></pre>
                                     <p class="game-text">
@@ -1195,8 +1198,6 @@ FString Recognizer::Recognize( const TArray< FMyPoint >& candidate_points )
     float min_distance = FLT_MAX;
     FString result = "No spell matched!";
 
-    const FDateTime tart_time = FDateTime::Now();
-
     for( int i = 0; i < m_templates.Num(); i++ )
     {
         // Finds the closest distance between each point in both shapes, angle_range set to 180 gives 
@@ -1210,28 +1211,105 @@ FString Recognizer::Recognize( const TArray< FMyPoint >& candidate_points )
         }
     }
     
-    const FDateTime end_time = FDateTime::Now();
-    const float elapsed_time = end_time.GetMillisecond() - tart_time.GetMillisecond();
-    
+    // Calculate a score to use for a margin of error
     const float score = 1.0f - min_distance * 2.0f;
-    
-    if( GEngine )
-        GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Emerald, FString::SanitizeFloat( elapsed_time ) );
-    
     if( score < 0.8f )
         result = "No spell matched!";
 
+    // Returns the matched template's name as a string
     return result;
 }
                                     </code></pre>
-                                </div>
-                            </div>
+                                    <p class="highlight">Painting and saving</p>
+                                    <p class="game-text">
+                                        To draw shapes I decided to make a painting widget that stores all points retrieved in the player's Tick. 
+                                    </p>
+                                    <p class="game-text">
+                                        If the player is painting: 
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+// Get previously drawn points
+const TArray< FMyPoint > points = m_painting_widget->GetPoints();
 
-                            <div>
-                                <img style="max-width: 400px; max-height: 300px;" class="game-image"
-                                    src="images/Loading.png">
-                                <p style="line-height: 0; font-size: small; font-style: italic; margin-top: 10px;">
-                                    Image discription.</p>
+// Gets mouse position and scales it to the viewport
+FVector2d mouse_pos;
+GEngine->GameViewport->GetMousePosition( mouse_pos );
+const FVector2D viewport_size = FVector2D( GEngine->GameViewport->Viewport->GetSizeXY() );
+const float viewport_scale = GetDefault< UUserInterfaceSettings >( UUserInterfaceSettings::StaticClass() )->
+    GetDPIScaleBasedOnSize( FIntPoint( viewport_size.X, viewport_size.Y ) );
+const FVector2D scaled_point = mouse_pos / viewport_scale;
+
+// Checks if current point is the same as the last one
+const FVector2D last_point = points.Num() > 0 ? points.Last().m_point : scaled_point;
+const bool is_new_point = !last_point.Equals( scaled_point, 1.0f );
+
+// If it is, or if there are no points, add it to the painting widget's stored points
+if( points.Num() == 0 || ( points.Num() > 0 && is_new_point ) )
+{
+    m_painting_widget->AddPoint( FMyPoint( scaled_point, m_stroke ) );
+}
+                                    </code></pre>
+                                    <p class="game-text">
+                                        To save shapes I made a training widget that takes the submitted points from the painting widget (if training mode is
+                                        enabled) and stores them in a data table.
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+void Recognizer::AddTemplate( const FString& name, const TArray< FMyPoint >& points )
+{
+// Initializes a Gesture that resamples, scalse and translates the shape, 
+// and adds it to the array
+m_templates.Add( Gesture( points, name ) );
+}
+                                    </code></pre>
+                                    <p class="game-text">
+                                        Adds a template to the data table and the recognizer object:
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+void ASpellDungeonPlayer::AddTemplateToDataTable( const FString Name )
+{
+    FTemplatesDataTable data_row;
+
+    data_row.m_name = Name;
+    data_row.m_points = m_painting_widget->GetPoints();
+
+    const FString ContextString = "Templates";
+    TArray< FTemplatesDataTable* > rows;
+
+    m_template_table->GetAllRows< FTemplatesDataTable >( ContextString, rows );
+
+    const int row_num = rows.Num() + 1;
+
+    // Adds template to an the templates data table
+    m_template_table->AddRow( FName( *FString::FromInt( row_num ) ), data_row );
+
+    // Adds template to an array in the recognizer object
+    m_recognizer->AddTemplate( Name, m_painting_widget->GetPoints() );
+
+    m_training_widget->RemoveFromParent();
+    m_painting_widget->RemoveFromParent();
+    m_player_controller->SetShowMouseCursor( false );
+    UWidgetBlueprintLibrary::SetInputMode_GameOnly( GetWorld()->GetFirstPlayerController() );
+}
+                                    </code></pre>
+                                    <p class="game-text">
+                                        Loads all saved templates from a data table:
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+void ASpellDungeonPlayer::LoadTemplates()
+{
+    if( m_template_table != nullptr )
+    {
+        const FString context_string = "Templates";
+        TArray< FTemplatesDataTable* > rows;
+
+        m_template_table->GetAllRows< FTemplatesDataTable >( context_string, rows );
+
+        for( int i = 0; i < rows.Num(); i++ )
+            m_recognizer->AddTemplate( rows[ i ]->m_name, rows[ i ]->m_points );
+    }
+}
+                                    </code></pre>
+                                </div>
                             </div>
                         </div>
 
@@ -1239,9 +1317,9 @@ FString Recognizer::Recognize( const TArray< FMyPoint >& candidate_points )
                             <h2 class="gameDesch2">Conclusion</h2>
                             <div class="game-information">
                                 <p class="game-text">
-                                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Deleniti ratione reprehenderit
-                                    hic quasi quibusdam, laboriosam consequuntur? Odio a unde labore eos culpa veniam
-                                    molestias harum, error quod animi quia assumenda?
+                                    This solo project has taught me more about Unreal Engine and all of it's countless features. I've learned about widgets
+                                    as well as data tables and some things about other ways of storing data. My initial goal with this project was to learn
+                                    about gesture recognizing, and making a 
                                 </p>
                             </div>
                         </div>
