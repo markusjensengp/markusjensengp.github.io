@@ -239,7 +239,7 @@
                             <section>
                                 <div class="project-video" :before>
                                     <video playsinline loop autoplay preload="metadata" muted>
-                                        <source src="videos/DriveBackSanJuegoTrailer.mp4" type="video/mp4">
+                                        <source src="videos/GestureRecognizerShowcase.mp4" type="video/mp4">
                                         " Your browser does not support the video tag or the file format of this video.
                                         "
                                     </video>
@@ -379,6 +379,8 @@
                         Skills
                     </h2>
                     <ul class="badge-list">
+                        <li class="badge">Fast learning</li>
+                        <li class="badge">Adapting</li>
                         <li class="badge">C++</li>
                         <li class="badge">C#</li>
                         <li class="badge">Git</li>
@@ -842,16 +844,16 @@ SuspensionFR->SetAngularOrientationTarget( FRotator( 0, Angle, 0 ) );
                     <div class="portfolio-top">
                         <div class="content-placeholder" :before>
                             <video playsinline loop autoplay preload="metadata" muted>
-                                <source src="videos/DriveBackSanJuegoGameplay.mp4" type="video/mp4">
+                                <source src="videos/GestureRecognizerShowcase.mp4" type="video/mp4">
                                 Your browser does not support the video tag or the file format of this video.
                             </video>
                         </div>
-                        <h2>Gameplay</h2>
+                        <h2>Showcase</h2>
                     </div>
                     <div class="projects">
                         <div class="projects-info-container">
 
-                            <img style="height: 450px; margin: 8px;" src="images/DriveBackSanJuegoPoster.png">
+                            <img style="height: 450px; margin: 8px;" src="images/GestureRecognizerPoster.png">
 
                             <section class="project-card">
 
@@ -910,45 +912,321 @@ SuspensionFR->SetAngularOrientationTarget( FRotator( 0, Angle, 0 ) );
                         <hr style="width: 85vw; margin: 32px;">
 
                         <div class=gamedesc>
-                            <h2 class="gameDesch2">How I did it</h2>
+                            <h2 class="gameDesch2">My solution</h2>
                             <div class="game-information">
                                 <div>
                                     <p class="game-text">
-                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam numquam quod
-                                        incidunt eum, placeat sed, excepturi adipisci quo possimus nesciunt animi
-                                        commodi ipsum at suscipit porro ea et repellendus ab!
+                                        At first I had to create an algorithm for resizing and resampling shapes into a set number of points so the recognizing
+                                        algorithm takes in two similar shapes.
+                                    </p>
+                                    <p class="highlight">Resampling process</p>
+                                    <p class="game-text">
+                                        To resample the array into the given number of points (sampling_resolution), I find the total path length by
+                                        sequentially adding the euclidean distance between the points, and then devide this by sampling_resolution - 1, to get
+                                        the interval length. Then I add points by interpolating new points along the path defined by the original points,
+                                        ensuring that the new set of points is evenly spaced along the path.
                                     </p>
                                     <p class="game-text">
-                                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Consectetur illum
-                                        maiores eius aperiam minima expedita voluptatum qui quod, numquam est amet
-                                        porro, deserunt aliquam nisi debitis cupiditate id, ullam voluptate.
+                                        Resample function:
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+void Gesture::Resample(TArray<FMyPoint>& points)
+{
+    TArray<FMyPoint> old_points = points;
+    points.Empty();
+    points.Init({}, sampling_resolution);
+    
+    points[0] = FMyPoint(FVector2D(old_points[0].m_point.X, old_points[0].m_point.Y), old_points[0].m_stroke_id);
+    int points_added = 1;
+
+    // Calculate the interval length based on the path length and sampling resolution.
+    const float interval = PathLength(old_points) / (sampling_resolution - 1.0f);
+
+    float D = 0.0f;  // Distance accumulator.
+
+    for (int i = 1; i < old_points.Num(); i++)
+    {
+        // Only process points that are in the same stroke.
+        if (old_points[i - 1].m_stroke_id == old_points[i].m_stroke_id)
+        {
+            float distance = Distance(old_points[i - 1], old_points[i]);
+            
+            // While the accumulated distance plus the current segment distance is 
+            // greater than or equal to the interval, it should add points
+            if (D + distance >= interval)
+            {
+                FMyPoint first_point = old_points[i - 1];
+
+                // Add interpolated points to the new points array.
+                while (D + distance >= interval)
+                {
+                    // Calculate the interpolation factor t.
+                    float t = FMath::Min(FMath::Max((interval - D) / distance, 0.0f), 1.0f);
+                    if (isnan(t)) t = 0.5f;
+                    
+                    // Add the interpolated point to the new points array.
+                    points[points_added++] = FMyPoint(
+                        FVector2D(
+                            (1.0f - t) * first_point.m_point.X + t * old_points[i].m_point.X,
+                            (1.0f - t) * first_point.m_point.Y + t * old_points[i].m_point.Y
+                        ),
+                        old_points[i].m_stroke_id
+                    );
+
+                    distance = D + distance - interval;
+                    D = 0.0f;
+                    first_point = points[points_added - 1];
+                }
+
+                D = distance;
+            }
+            else
+            {
+                D += distance;
+            }
+        }
+    }
+
+    // If the last point has not been added, add the last point of the old points array.
+    if (points_added == sampling_resolution - 1)
+        points[points_added] = old_points.Last();
+}
+                                    </code></pre>
+                                    <p class="highlight">Scale and translate</p>
+                                    <p class="game-text">
+                                        The next step was to scale and translate the shape so that your drawn shape and the template it compares with, shares
+                                        the same size and position.
                                     </p>
                                     <p class="game-text">
-                                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugiat doloribus
-                                        aspernatur sunt omnis ea magni repellendus eaque assumenda laborum perspiciatis
-                                        molestiae animi nulla praesentium reiciendis fugit cupiditate, sed corporis id!
+                                        Scale function:
                                     </p>
-                                </div>
-                                <div>
-                                    <img style="max-width: 400px; max-height: 300px;" class="game-image"
-                                        src="images/Loading.png">
-                                    <p
-                                        style="line-height: 0; font-size: small; font-style: italic; margin-left: 50px; margin-top: 10px;">
-                                        Image discription.</p>
+                                    <pre id="code-section"><code class="language-cpp">
+void Gesture::Scale( TArray< FMyPoint >& points )
+{
+    float min_x = FLT_MAX, min_y = FLT_MAX;
+    float max_x = FLT_MIN, max_y = FLT_MIN;
+
+    // Find the bounding box of the points
+    for( int i = 0; i < points.Num(); i++ )
+    {
+        if( min_x > points[ i ].m_point.X ) min_x = points[ i ].m_point.X;
+        if( min_y > points[ i ].m_point.Y ) min_y = points[ i ].m_point.Y;
+        if( max_x < points[ i ].m_point.X ) max_x = points[ i ].m_point.X;
+        if( max_y < points[ i ].m_point.Y ) max_y = points[ i ].m_point.Y;
+    }
+
+    // Calculate the scale based on the maximum dimension of the bounding box
+    const float scale = FMath::Max( max_x - min_x, max_y - min_y );
+
+    TArray< FMyPoint > old_points = points;
+    points.Empty();
+
+    // Scale the points to fit within a unit square
+    for( int i = 0; i < old_points.Num(); i++ )
+    {
+        points.Add( FMyPoint(
+            FVector2D( ( old_points[ i ].m_point.X - min_x ) / scale, ( old_points[ i ].m_point.Y - min_y ) / scale ),
+            old_points[ i ].m_stroke_id ) );
+    }
+}
+                                    </code></pre>
+                                    <p class="game-text">
+                                        Translating the shape to be centered at coordinates (0, 0), I first had to find the centroid of the shape.
+                                    </p>
+                                    <p class="game-text">
+                                        Centroid function:
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+FMyPoint Gesture::Centroid( TArray< FMyPoint >& points )
+{
+    float centroid_x = 0.0f, centroid_y = 0.0f;
+
+    for( int i = 0; i < points.Num(); i++ )
+    {
+        centroid_x += points[ i ].m_point.X;
+        centroid_y += points[ i ].m_point.Y;
+    }
+
+    return FMyPoint( FVector2D( centroid_x / points.Num(), centroid_y / points.Num() ), 0 );
+}
+                                    </code></pre>
+                                    <p class="game-text">
+                                        Translate function:
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+void Gesture::TranslateTo( TArray< FMyPoint >& points, FMyPoint centroid )
+{
+    TArray< FMyPoint > old_points = points;
+    points.Empty();
+
+    for( int i = 0; i < old_points.Num(); i++ )
+    {
+        points.Add( FMyPoint(
+            FVector2D( old_points[ i ].m_point.X - centroid.m_point.X, old_points[ i ].m_point.Y - centroid.m_point.Y ),
+            old_points[ i ].m_stroke_id ) );
+    }
+}
+                                    </code></pre>
+                                    <p class="highlight">Recognition</p>
+                                    <p class="game-text">
+                                        Finds distance between each point in your drawn shape and a template shape:
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+float Recognizer::PathDistance( const TArray< FMyPoint >& path_a, const TArray< FMyPoint >& path_b )
+{
+    const int n = path_a.Num();
+    std::vector< bool > matched( n, false );
+
+    float sum = 0.0f;
+    for( int i = 0; i < n; i++ )
+    {
+        int index = -1;
+        float min_distance = FLT_MAX;
+        for( int j = 0; j < n; j++ )
+        {
+            if( !matched[ j ] )
+            {
+                const float distance = Gesture::Distance( path_a[ i ], path_b[ j ] );
+                if( distance < min_distance )
+                {
+                    min_distance = distance;
+                    index = j;
+                }
+            }
+        }
+        matched[ index ] = true;
+        sum += min_distance;
+    }
+
+    return ( sum / path_a.Num() );
+}
+                                    </code></pre>
+                                    <p class="game-text">
+                                        Finds distance at current angle:
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+float Recognizer::DistanceAtAngle( const TArray< FMyPoint >& candidate_points, const TArray< FMyPoint >& template_points,
+                                   const float& radians )
+{
+    TArray< FMyPoint > new_points = candidate_points;
+    Gesture::RotateBy( new_points, radians );
+    return PathDistance( new_points, template_points );
+}
+                                    </code></pre>
+                                    <p class="game-text">
+                                        Using a golden section search, I could more efficiently narrow down the search range and reduce the number of distance
+                                        calculations needed to find the optimal angle for matching the shapes.
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+void Recognizer::GoldenSectionSearch( const float& a, const float& b, const TArray< FMyPoint >& candidate_points,
+                                      const TArray< FMyPoint >& template_points, float& x, float& f )
+{
+    // Calculate next angle using the golden section ratio
+    x = phi * a + ( 1.0 - phi ) * b;
+    // Calculate distance at this angle
+    f = DistanceAtAngle( candidate_points, template_points, x );
+}
+                                    </code></pre>
+                                    <p class="game-text">
+                                        Using the GoldenSectionSearch function, DistanceAtAngle finds the best angle and returns the smalles distance between
+                                        the points.
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+float Recognizer::DistanceAtBestAngle( const TArray< FMyPoint >& candidate_points,
+                                       const TArray< FMyPoint >& template_points, const float& from_angle,
+                                       const float& to_angle, const float& threshold )
+{
+    float current_from_angle = from_angle;
+    float current_to_angle = to_angle;
+    float x1, x2, d1, d1;
+
+    GoldenSectionSearch( current_from_angle, current_to_angle, candidate_points, template_points, x1, d1 );
+    GoldenSectionSearch( current_to_angle, current_from_angle, candidate_points, template_points, x2, d1 );
+
+    // Continue narrowing the search range until the difference between bounds is less than the threshold
+    while( FMath::Abs( current_to_angle - current_from_angle ) > threshold )
+    {
+        // Update the bounds based on the results of the golden section search
+        if( d1 < d2 )
+        {
+            current_to_angle = x2; // Update the upper bound
+            x2 = x1;               // Move the second angle to the first angle
+            d2 = d1;               // Move the second distance to the first distance
+
+            // New search
+            GoldenSectionSearch( current_from_angle, current_to_angle, candidate_points, template_points, x1, d1 );
+        }
+        else
+        {
+            current_from_angle = x1; // Update the lower bound
+            x1 = x2;                 // Move the first angle to the second angle
+            d1 = d2;                 // Move the first distance to the second distance
+            
+            // New search
+            GoldenSectionSearch( current_to_angle, current_from_angle, candidate_points, template_points, x2, d2 );
+        }
+    }
+
+    return FMath::Min( d1, d2 );
+}
+
+void Recognizer::GoldenSectionSearch( const float& a, const float& b, const TArray< FMyPoint >& candidate_points,
+                    const TArray< FMyPoint >& template_points, float& x, float& f )
+{
+    x = phi * a + ( 1.0 - phi ) * b;
+    f = DistanceAtAngle( candidate_points, template_points, x );
+}
+                                    </code></pre>
+                                    <p class="game-text">
+                                        Recognize function (called when a shape is submitted):
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+FString Recognizer::Recognize( const TArray< FMyPoint >& candidate_points )
+{
+    // Ensures that the shape is neither too small nor too large
+    if( Gesture::PathLength( candidate_points ) < 25.0f )
+        return "Too short!";
+    if( Gesture::PathLength( candidate_points ) > 2000.0f )
+        return "Too long!";
+
+    // Initializes a gesture to resample, scale and translate your drawn points
+    const Gesture gesture = Gesture( candidate_points );
+
+    float min_distance = FLT_MAX;
+    FString result = "No spell matched!";
+
+    const FDateTime tart_time = FDateTime::Now();
+
+    for( int i = 0; i < m_templates.Num(); i++ )
+    {
+        // Finds the closest distance between each point in both shapes, angle_range set to 180 gives 
+        // a 360 degree range to draw your shape
+        const float distance = DistanceAtBestAngle( gesture.m_points, m_templates[ i ].m_points, -angle_range,
+                                                    angle_range, angle_precision );
+        if( distance < min_distance )
+        {
+            min_distance = distance;
+            result = m_templates[ i ].m_name;
+        }
+    }
+    
+    const FDateTime end_time = FDateTime::Now();
+    const float elapsed_time = end_time.GetMillisecond() - tart_time.GetMillisecond();
+    
+    const float score = 1.0f - min_distance * 2.0f;
+    
+    if( GEngine )
+        GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Emerald, FString::SanitizeFloat( elapsed_time ) );
+    
+    if( score < 0.8f )
+        result = "No spell matched!";
+
+    return result;
+}
+                                    </code></pre>
                                 </div>
                             </div>
 
-                            <div class="game-information">
-                                <div>
-                                    <p class="game-text">
-                                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum magnam,
-                                        voluptate ab
-                                        doloribus esse pariatur dolorum unde, natus non deleniti ut nobis? Minus sunt
-                                        nihil
-                                        optio voluptate a, ea ratione.
-                                    </p>
-                                </div>
-                            </div>
                             <div>
                                 <img style="max-width: 400px; max-height: 300px;" class="game-image"
                                     src="images/Loading.png">
