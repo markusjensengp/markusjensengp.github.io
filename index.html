@@ -346,11 +346,11 @@
                                             d="M96 480c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L242.8 256L73.38 86.63c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l192 192c12.5 12.5 12.5 32.75 0 45.25l-192 192C112.4 476.9 104.2 480 96 480z">
                                         </path>
                                     </svg>
-                                    <small>Gameplay programmer</small>
+                                    <small>Gameplay/generalist programmer</small>
                                 </h3>
                                 <p>
                                     Best Laid Schemes is a turn-based strategy game where you execute a heist. In this
-                                    project I have made a few gamplay features and helped everywhere
+                                    project I have made a few gamplay features and helped everywhere.
                                 </p>
                             </section>
                         </button>
@@ -1309,6 +1309,60 @@ void ASpellDungeonPlayer::LoadTemplates()
     }
 }
                                     </code></pre>
+                                    <p class="highlight">Pen stabilizer</p>
+                                    <p class="game-text">
+                                        I noticed that it could sometimes be hard to draw certain shapes, such as circles or straight lines, so I implemented a
+                                        very simple pen stabilizer that takes all points in the current stroke and smoothes them out.
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+void ASpellDungeonPlayer::SmoothCurrentStroke( TArray< FMyPoint >& points )
+{
+    TArray< FMyPoint* > smoothing_points;
+
+    // Find points in current stroke
+    for( int i = 0; i < points.Num(); i++ )
+    {
+        if( i == 0 )
+            continue;
+        if( points[ i ].m_stroke_id == m_stroke && 
+            points[ i - 1 ].m_stroke_id == points[ i ].m_stroke_id && 
+            i != points.Num() - 1 )
+            smoothing_points.Add( &points[ i ] );
+    }
+
+    // Run smoothing algorithm on found points
+    SmoothPoints( smoothing_points );
+}
+
+void ASpellDungeonPlayer::SmoothPoints( TArray< FMyPoint* >& points )
+{
+    TArray< FMyPoint* > old_points = points;
+
+    // Calculate the average x and y value for each point and its neighboring points
+    // smoothing_window set to 1 gives the previous and next point as neighboring points
+    for( int i = 0; i < old_points.Num(); ++i )
+    {
+        float sum_x = 0.0f;
+        float sum_y = 0.0f;
+        int count = 0;
+
+        
+        for( int j = -smoothing_window; j <= smoothing_window; ++j )
+        {
+            const int index = i + j;
+            if( index >= 0 && index < old_points.Num() )
+            {
+                sum_x += old_points[ index ]->m_point.X;
+                sum_y += old_points[ index ]->m_point.Y;
+                count++;
+            }
+        }
+
+        points[ i ]->m_point.X = sum_x / count;
+        points[ i ]->m_point.Y = sum_y / count;
+    }
+}
+                                    </code></pre>
                                 </div>
                             </div>
                         </div>
@@ -1319,7 +1373,13 @@ void ASpellDungeonPlayer::LoadTemplates()
                                 <p class="game-text">
                                     This solo project has taught me more about Unreal Engine and all of it's countless features. I've learned about widgets
                                     as well as data tables and some things about other ways of storing data. My initial goal with this project was to learn
-                                    about gesture recognizing, and making a 
+                                    about gesture recognizing, and making a good controller for it, which I did. But I have learned more about the engine 
+                                    itself than I have about gesture recognizing. I have also learned a bit about pen stabilizers and how they work, which 
+                                    I had no intention of when I first started this project.
+                                </br>
+                                </br>
+                                    My outtake from this project is that projects don't always end up like planned, but you will always learn something, even 
+                                    if it's not what you had planned on learning.
                                 </p>
                             </div>
                         </div>
@@ -1348,7 +1408,7 @@ void ASpellDungeonPlayer::LoadTemplates()
                     <div class="projects">
                         <div class="projects-info-container">
 
-                            <img style="height: 450px; margin: 8px;" src="images/DriveBackSanJuegoPoster.png">
+                            <img style="height: 450px; margin: 8px;" src="images/BestLaidSchemesPoster.png">
 
                             <section class="project-card">
 
@@ -1363,7 +1423,7 @@ void ASpellDungeonPlayer::LoadTemplates()
                                                 d="M224 256c70.7 0 128-57.31 128-128s-57.3-128-128-128C153.3 0 96 57.31 96 128S153.3 256 224 256zM274.7 304H173.3C77.61 304 0 381.6 0 477.3c0 19.14 15.52 34.67 34.66 34.67h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304z">
                                             </path>
                                         </svg>
-                                        Solo project
+                                        Group size: 11
                                     </li>
                                     <li>
                                         <svg class="svg-inline--fa fa-user list-icon" aria-hidden="true"
@@ -1373,7 +1433,7 @@ void ASpellDungeonPlayer::LoadTemplates()
                                                 d="M256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512zM232 256C232 264 236 271.5 242.7 275.1L338.7 339.1C349.7 347.3 364.6 344.3 371.1 333.3C379.3 322.3 376.3 307.4 365.3 300L280 243.2V120C280 106.7 269.3 96 255.1 96C242.7 96 231.1 106.7 231.1 120L232 256z">
                                             </path>
                                         </svg>
-                                        Time frame: 4 Weeks
+                                        Time frame: 6 Weeks
                                     </li>
                                     <li>
                                         <svg class="svg-inline--fa fa-user list-icon" aria-hidden="true"
@@ -1383,7 +1443,7 @@ void ASpellDungeonPlayer::LoadTemplates()
                                                 d="M331.8 224.1c28.29 0 54.88 10.99 74.86 30.97l19.59 19.59c40.01-17.74 71.25-53.3 81.62-96.65c5.725-23.92 5.34-47.08 .2148-68.4c-2.613-10.88-16.43-14.51-24.34-6.604l-68.9 68.9h-75.6V97.2l68.9-68.9c7.912-7.912 4.275-21.73-6.604-24.34c-21.32-5.125-44.48-5.51-68.4 .2148c-55.3 13.23-98.39 60.22-107.2 116.4C224.5 128.9 224.2 137 224.3 145l82.78 82.86C315.2 225.1 323.5 224.1 331.8 224.1zM384 278.6c-23.16-23.16-57.57-27.57-85.39-13.9L191.1 158L191.1 95.99l-127.1-95.99L0 63.1l96 127.1l62.04 .0077l106.7 106.6c-13.67 27.82-9.251 62.23 13.91 85.39l117 117.1c14.62 14.5 38.21 14.5 52.71-.0016l52.75-52.75c14.5-14.5 14.5-38.08-.0016-52.71L384 278.6zM227.9 307L168.7 247.9l-148.9 148.9c-26.37 26.37-26.37 69.08 0 95.45C32.96 505.4 50.21 512 67.5 512s34.54-6.592 47.72-19.78l119.1-119.1C225.5 352.3 222.6 329.4 227.9 307zM64 472c-13.25 0-24-10.75-24-24c0-13.26 10.75-24 24-24S88 434.7 88 448C88 461.3 77.25 472 64 472z">
                                             </path>
                                         </svg>
-                                        Engine: Unreal Engine 5
+                                        Engine: TenGine (In-house)
                                     </li>
                                     <li>
                                         <svg class="svg-inline--fa fa-user list-icon" aria-hidden="true"
@@ -1393,21 +1453,32 @@ void ASpellDungeonPlayer::LoadTemplates()
                                                 d="M528 0H48C21.49 0 0 21.49 0 48V384C0 410.5 21.49 432 48 432H240V480H176C167.2 480 160 487.2 160 496C160 504.8 167.2 512 176 512H400C408.8 512 416 504.8 416 496C416 487.2 408.8 480 400 480H336V432H528C554.5 432 576 410.5 576 384V48C576 21.49 554.5 0 528 0zM528 384H48V48H528V384z">
                                             </path>
                                         </svg>
-                                        Platform: PC
+                                        Platform: PS5
                                     </li>
                                 </ul>
                             </section>
                             <section class="project-card">
                                 <h3>Project Summary</h3>
-                                I have made a multistroke gestrue recognizing algorithm, using the $1 algorithm as a
-                                base.
+                                Best Laid Schemes is an isometric turn-based stealth game where the player is in control of three heist-ready animal
+                                characters, entrusted to steal back a prized possession by their crime boss.
                             </section>
                         </div>
 
                         <hr style="width: 85vw; margin: 32px;">
 
                         <div class=gamedesc>
-                            <h2 class="gameDesch2">How I did it</h2>
+                            <h2 class="gameDesch2">My contribution</h2>
+                            <div class="game-information">
+                                <div>
+                                    <p class="game-text">
+                                        This was my first ever group project. It was made in our schools in-house engine (TenGine), which gave us some limitations
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class=gamedesc>
+                            <h2 class="gameDesch2">My contribution</h2>
                             <div class="game-information">
                                 <div>
                                     <p class="game-text">
@@ -1433,24 +1504,6 @@ void ASpellDungeonPlayer::LoadTemplates()
                                         style="line-height: 0; font-size: small; font-style: italic; margin-left: 50px; margin-top: 10px;">
                                         Image discription.</p>
                                 </div>
-                            </div>
-
-                            <div class="game-information">
-                                <div>
-                                    <p class="game-text">
-                                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum magnam,
-                                        voluptate ab
-                                        doloribus esse pariatur dolorum unde, natus non deleniti ut nobis? Minus sunt
-                                        nihil
-                                        optio voluptate a, ea ratione.
-                                    </p>
-                                </div>
-                            </div>
-                            <div>
-                                <img style="max-width: 400px; max-height: 300px;" class="game-image"
-                                    src="images/Loading.png">
-                                <p style="line-height: 0; font-size: small; font-style: italic; margin-top: 10px;">
-                                    Image discription.</p>
                             </div>
                         </div>
 
