@@ -109,12 +109,15 @@
                                 <div>
                                     <h2 class="gameDesch2">About Me</h2>
                                     <p class="game-text" style="margin-top: 20px;">
-                                        Hello there, I'm Markus Jensen, an invested
-                                        <strong>Game Programmer</strong> currently studying at PlaygroundSquad in
-                                        Sweden.
+                                        Hello, I'm Markus Jensen, a game programmer currently studying at PlaygroundSquad in Falun, Sweden. I found my passion
+                                        for programming during my second year in high school when I had an introduction course in python. After that, I've just
+                                        been learning more and more during my 3 years of programming.
+                                        <br>
+                                        When I'm not programming, I am probably playing games. Or I could be playing the piano, riding skateboard or looking at
+                                        listings of cars I can't afford.
                                     </p>
                                     <p class="game-text">
-                                        Want to know more? Contact me on my socials or at <a id="mail-link"
+                                        If you want to know more, feel free to contact me on my socials or mail at <a id="mail-link"
                                             href="mailto:jensenmarkus.04@gmail.com"><strong>jensenmarkus.04@gmail.com</strong></a>
                                     </p>
                                 </div>
@@ -122,11 +125,10 @@
                         </div>
 
                         <div style="margin-top: 20px;" class=gamedesc>
-                            <h2>My favourite Games</h2>
+                            <h2 class="gameDesch2">favorite Games</h2>
                             <div class="game-information">
                                 <p class="game-text">
-                                    If you are curious about my favorite games at the moment, they are:
-                                    Noita, League of Legends, Valheim, Into the Breach, and Elden Ring.
+                                    My favorite games at the moment are: League of Legends, Valorant, and Assetto Corsa.
                                 </p>
                             </div>
                         </div>
@@ -156,10 +158,7 @@
                     <div class="about-information">
                         <img class="profile-image" src="images/profile-image.jpg">
                         <p class="about-text">
-                            Hello! My name is Markus, I am a game programmer with a great interest in gameplay
-                            programming. I
-                            love creating mechanics and features, and finding my way around all sorts of problems.
-                            </br>
+                            Game programmer who loves creating mechanics and features, and finding my way around all sorts of problems.
                             Currently looking for an internship in game programming.
                             </br>
                             Below you can find all projects I have been part of, that highlight most of my game
@@ -379,13 +378,13 @@
                         Skills
                     </h2>
                     <ul class="badge-list">
-                        <li class="badge">Fast learning</li>
-                        <li class="badge">Adapting</li>
                         <li class="badge">C++</li>
                         <li class="badge">C#</li>
                         <li class="badge">Git</li>
                         <li class="badge">Unreal Engine</li>
                         <li class="badge">Blueprints</li>
+                        <li class="badge">Fast learning</li>
+                        <li class="badge">Adapting</li>
                     </ul>
 
                 </section>
@@ -1494,30 +1493,147 @@ void ASpellDungeonPlayer::SmoothPoints( TArray< FMyPoint* >& points )
                             <div class="game-information">
                                 <div>
                                     <p class="game-text">
-                                        This was my first ever group project. It was made in our schools in-house engine (TenGine), which gave us some limitations
+                                        This was the first project during my time at PlaygroundSquad, and my very first group project. It was made in our
+                                        schools in-house engine (TenGine), which gave us some limitations, but also a lot of opportunities to learn. 
+                                        </br>
+                                        </br>
+                                        As we were only 3 programmers in our group and everything had to be built from the ground up, we all had specified tasks
+                                        to do, but I also aquired the role of generalist since all of us needed help to finish everything in our short
+                                        timeframe.
+                                        </br>
+                                        </br>
+                                        My main focus was making the characters; enemies and players, and the camera controller. But I also contributed in our
+                                        pathfinding, animations, and gameloop system.
                                     </p>
+                                </div>
+                            </div> 
+                        </div>
+
+                        <div class=gamedesc>
+                            <h2 class="gameDesch2">Camera controller</h2>
+                            <div class="game-information">
+                                <div>
+                                    <p class="game-text">
+                                        The camera controller is quite simple, it's movable up, down, left and right, and rotatable around the vertical axis. 
+                                    </p>
+                                    <video playsinline loop autoplay preload="metadata" muted>
+                                        <source src="videos/" type="video/mp4">
+                                        Your browser does not support the video tag or the file format of this video.
+                                    </video>
+                                    <p class="game-text">Input code:</p>
+                                    <pre id="code-section"><code class="language-cpp">
+// Input for zoom through scroll wheel
+case tg::Input::eType::kMouseWheel:
+{
+    m_time_since_change = 0.0f;
+    m_target_zoom       = tg::MathCE::clamp( m_min_zoom, m_current_zoom - _event.event.mouse.wheel / 480.0f, m_max_zoom );
+    m_start_zoom        = m_current_zoom;
+}
+break;
+
+// Input for buttons
+case tg::Input::eType::kKeyDown:
+{
+    if( _event.event.keyboard.repeat == 0 ) 
+        m_input.action_mask |= actionFromKey( _event.event.keyboard.virtual_key );
+}
+break;
+
+case tg::Input::eType::kKeyUp:
+{
+    if( _event.event.keyboard.repeat == 0 ) 
+        m_input.action_mask &= ~actionFromKey( _event.event.keyboard.virtual_key );
+}
+break;
+                                    </code></pre>
+                                    <p class="game-text">Movement code:</p>
+                                    <pre id="code-section"><code class="language-cpp">
+// Function to move camera matrix
+void cCameraController::move( const tg::cVector2f& _movement )
+{
+    const tg::cMatrix4x4f& matrix = tg::Matrix4x4::rotateY( m_rotation.y );
+
+    m_position += matrix.left() * _movement.x;
+    m_position += matrix.at()   * _movement.y;
+}
+                                    </code></pre>
+                                    <p class="game-text">Read input and update:</p>
+                                    <pre id="code-section"><code class="language-cpp">
+// Check if any rotate input is being received and if currently not rotating
+// If so save current rotation and start rotating
+if( isActing( sInput::eAction::RotateLeft ) && !m_rotating_left && !m_rotating_right )
+{
+    m_rotating_left = true;
+    m_initial_rotation = m_rotation.y;
+}
+if( isActing( sInput::eAction::RotateRight ) && !m_rotating_left && !m_rotating_right )
+{
+    m_rotating_right = true;
+    m_initial_rotation = m_rotation.y;
+}
+
+// If rotating lerp from initial rotation to 90 degrees less or more
+if( m_rotating_left )
+{
+    m_timer += _delta_time;
+    if( m_timer > m_rotation_time )
+        m_timer = m_rotation_time;
+    m_rotation.y = tg::Lerp::linear( m_initial_rotation, m_initial_rotation - 90.0f, m_timer / m_rotation_time );
+}
+if( m_rotating_right )
+{
+    m_timer += _delta_time;
+    if( m_timer > m_rotation_time )
+        m_timer = m_rotation_time;
+    m_rotation.y = tg::Lerp::linear( m_initial_rotation, m_initial_rotation + 90.0f, m_timer / m_rotation_time );
+}
+
+// Stop rotating
+if( m_timer == m_rotation_time )
+{
+    m_rotating_left  = false;
+    m_rotating_right = false;
+    m_timer = 0.0f;
+}
+
+// Check for movement input
+const tg::cVector2f movement =
+{
+    ( static_cast< float >( isActing( sInput::eAction::MoveLeft ) ) - static_cast< float >( isActing( sInput::eAction::MoveRight ) ) ),
+    ( static_cast< float >( isActing( sInput::eAction::MoveUp   ) ) - static_cast< float >( isActing( sInput::eAction::MoveDown  ) ) )
+};
+
+// Call function to move camera matrix
+move( movement * m_movement_speed * m_zoom_distance * _delta_time );
+
+// Lerp zoom
+m_time_since_change = tg::MathCE::min ( m_time_since_change + _delta_time * m_zoom_speed, 1.0f );
+m_current_zoom      = tg::Lerp::linear( m_start_zoom, m_target_zoom, m_time_since_change );
+m_zoom_distance     = m_current_zoom;
+
+// Update camera zoom
+camera.ortho_size = tg::cVector2f(camera.viewport.width * m_current_zoom, camera.viewport.height * m_current_zoom);
+camera.calcProjection( true );
+camera.update();
+
+// Update position and rotation
+m_transform.local.rotateTranslate(m_rotation, m_position, tg::Matrix4x4::eCombine::kReplace );
+m_transform.update();
+                                    </code></pre>
                                 </div>
                             </div>
                         </div>
 
                         <div class=gamedesc>
-                            <h2 class="gameDesch2">My contribution</h2>
+                            <h2 class="gameDesch2">Characters</h2>
                             <div class="game-information">
                                 <div>
+                                    <p class="highlight">Character base class</p>
                                     <p class="game-text">
-                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam numquam quod
-                                        incidunt eum, placeat sed, excepturi adipisci quo possimus nesciunt animi
-                                        commodi ipsum at suscipit porro ea et repellendus ab!
-                                    </p>
-                                    <p class="game-text">
-                                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Consectetur illum
-                                        maiores eius aperiam minima expedita voluptatum qui quod, numquam est amet
-                                        porro, deserunt aliquam nisi debitis cupiditate id, ullam voluptate.
-                                    </p>
-                                    <p class="game-text">
-                                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugiat doloribus
-                                        aspernatur sunt omnis ea magni repellendus eaque assumenda laborum perspiciatis
-                                        molestiae animi nulla praesentium reiciendis fugit cupiditate, sed corporis id!
+                                        I decided to create a base class for a character that the player and enemy class would derive from, to simplify things
+                                        and not have to rewrite code that they would both need.
+                                        <br>
+                                         
                                     </p>
                                 </div>
                                 <div>
