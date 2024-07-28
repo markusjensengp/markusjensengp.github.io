@@ -506,9 +506,64 @@
                                     <p class="game-text">
                                         Since my only responsibility was the car controller, I had time to continue evolving it once I had completed the feature
                                         I was previously working on. Therefore there are a lot of features added to the car controller, considering the
-                                        timeframe we had.
+                                        timeframe we had, including:
+                                        <br>
+                                        - Realistic suspension using UE5 physics constraints
+                                        <br>
+                                        - Gearbox simulation with adjustable gfear ratios
+                                        <br>
+                                        - Adjustable automatic gearbox values (shift up/down RPM, shift time)
+                                        <br>
+                                        - Adjustable engine values (max/min RPM, torque curve)
+                                        <br>
+                                        - Torque curve depending on RPM 
+                                        <br>
+                                        - RPM depending on wheel angular rotation
+                                        <br>
+                                        - Anti-rollbars with adjustable stiffness
+                                        <br>
+                                        - Togglable ABS
+                                        <br>
+                                        - Adjustable traction control
+                                        <br>
+                                        - Differential gear ratio
+                                        <br>
+                                        - Selectable drivetrain (RWD, FWD, AWD)
+                                        <br>
+                                        - Gameplay affecting damage
                                     </p>
-                                    
+                                    <p class="highlight">Realistic suspension using UE5 physics constraints </p>
+                                    <p class="game-text">Using Unreal Engine 5's physics constraints to set up suspension allowed me to create a fairly
+                                        realistic suspension setup with two physics constraints for each wheel. One for connecting a wheel hub to the body
+                                        so hub and wheel can travel up and down, and one to connect the wheel to the hub to enable the wheel to spin.
+                                    </p>
+                                    <div class="game-information">
+                                        <div>
+                                            <img style="max-width: 400px; max-height: 300px;" class="game-image"
+                                                src="images/Loading.png">
+                                            <p
+                                                style="line-height: 0; font-size: small; font-style: italic; margin-left: 32px; margin-top: 10px; margin-bottom: 16px;">
+                                                Image discription.
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <img style="max-width: 400px; max-height: 300px;" class="game-image"
+                                                src="images/Loading.png">
+                                            <p
+                                                style="line-height: 0; font-size: small; font-style: italic; margin-left: 32px; margin-top: 10px; margin-bottom: 16px;">
+                                                Image discription.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <p class="game-text">Steering using physics constraints
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+// Calculates angle from input and vehicle speed, resulting in smoother turning during high speed
+Angle = SteeringValue * MaxSteeringAngle * ( 1 - VehicleSpeed / 125.0f );
+
+SuspensionFL->SetAngularOrientationTarget( FRotator( 0, Angle, 0 ) );
+SuspensionFR->SetAngularOrientationTarget( FRotator( 0, Angle, 0 ) );
+                                    </code></pre>
                                     <p class="highlight">Gearbox simulation with adjustable gear ratios</p>
                                     <p class="game-text">Gear ratios are handled by the array GearRatios, and are used in every appearance of engine RPM or
                                         torque.
@@ -684,7 +739,7 @@ if( AbsEnabled && abs( ConnectedWheelRPM / 60.0f * KMHperWheelRPS - VehicleSpeed
     AxisRR->SetAngularDriveParams( 0.0f, BrakeStrength * -ThrottleValue, 0.0f );
 }
                                     </code></pre>
-                                    <p class="highlight">Adjustable Traction Crontrol </p>
+                                    <p class="highlight">Adjustable Traction Control </p>
                                     <p class="game-text">Traction control is implied in the throttle handling section. The code checks if the difference
                                         between the connected wheel RPM and vehicle speed is within a certain limit. If not, the torque is not applied to
                                         the wheels.
@@ -773,38 +828,6 @@ if( WheelDmgRotFL )
 
 // Handled in HandleSteering function
 SuspensionFL->SetAngularOrientationTarget( FRotator( 0, Angle + WheelDmgRotFL, 0 ) );
-                                    </code></pre>
-                                    <p class="highlight">Realistic suspension using UE5 physics constraints </p>
-                                    <p class="game-text">Using Unreal Engine 5's physics constraints to set up suspension allowed me to create a fairly
-                                        realistic suspension setup with two physics constraints for each wheel. One for connecting a wheel hub to the body
-                                        so hub and wheel can travel up and down, and one to connect the wheel to the hub to enable the wheel to spin.
-                                    </p>
-                                    <div class="game-information">
-                                        <div>
-                                            <img style="max-width: 400px; max-height: 300px;" class="game-image"
-                                                src="images/Loading.png">
-                                            <p
-                                                style="line-height: 0; font-size: small; font-style: italic; margin-left: 32px; margin-top: 10px; margin-bottom: 16px;">
-                                                Image discription.
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <img style="max-width: 400px; max-height: 300px;" class="game-image"
-                                                src="images/Loading.png">
-                                            <p
-                                                style="line-height: 0; font-size: small; font-style: italic; margin-left: 32px; margin-top: 10px; margin-bottom: 16px;">
-                                                Image discription.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <p class="game-text">Steering using physics constraints
-                                    </p>
-                                    <pre id="code-section"><code class="language-cpp">
-// Calculates angle from input and vehicle speed, resulting in smoother turning during high speed
-Angle = SteeringValue * MaxSteeringAngle * ( 1 - VehicleSpeed / 125.0f );
-
-SuspensionFL->SetAngularOrientationTarget( FRotator( 0, Angle, 0 ) );
-SuspensionFR->SetAngularOrientationTarget( FRotator( 0, Angle, 0 ) );
                                     </code></pre>
                                 </div>
                             </div>
