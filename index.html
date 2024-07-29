@@ -1522,27 +1522,51 @@ void ASpellDungeonPlayer::SmoothPoints( TArray< FMyPoint* >& points )
                                     </video>
                                     <p class="game-text">Input code:</p>
                                     <pre id="code-section"><code class="language-cpp">
-// Input for zoom through scroll wheel
-case tg::Input::eType::kMouseWheel:
+case tg::Input::eType::kStick:
 {
-    m_time_since_change = 0.0f;
-    m_target_zoom       = tg::MathCE::clamp( m_min_zoom, m_current_zoom - _event.event.mouse.wheel / 480.0f, m_max_zoom );
-    m_start_zoom        = m_current_zoom;
+    if( _event.event.gamepad.stick_id == 1 )
+    {
+        // Adds action to input action mask if statement returns true
+        // Otherwise it removes the action
+        m_input.action_mask |= ( _event.event.current_position.x < -0.5f ) ? sInput::eAction::MoveLeft
+            : m_input.action_mask &= ~sInput::eAction::MoveLeft;
+        m_input.action_mask |= ( _event.event.current_position.x > 0.5f )  ? sInput::eAction::MoveRight
+            : m_input.action_mask &= ~sInput::eAction::MoveRight;
+        m_input.action_mask |= ( _event.event.current_position.y < -0.5f ) ? sInput::eAction::MoveUp
+            : m_input.action_mask &= ~sInput::eAction::MoveUp;
+        m_input.action_mask |= ( _event.event.current_position.y > 0.5f )  ? sInput::eAction::MoveDown
+            : m_input.action_mask &= ~sInput::eAction::MoveDown;
+    }
 }
 break;
 
-// Input for buttons
-case tg::Input::eType::kKeyDown:
+case tg::Input::eType::kButtonDown:
 {
-    if( _event.event.keyboard.repeat == 0 ) 
-        m_input.action_mask |= actionFromKey( _event.event.keyboard.virtual_key );
+    // Checks for zoom input
+    if( _event.event.gamepad.button_id == SCE_PAD_BUTTON_L2 )
+    {
+        m_time_since_change = 0;
+        m_target_zoom       = tg::MathCE::clamp( m_min_zoom, m_target_zoom + 1, m_max_zoom );
+        m_start_zoom        = m_current_zoom;
+    }
+    else if( _event.event.gamepad.button_id == SCE_PAD_BUTTON_R2 )
+    {
+        m_time_since_change = 0;
+        m_target_zoom       = tg::MathCE::clamp( m_min_zoom, m_target_zoom - 1, m_max_zoom);
+        m_start_zoom        = m_current_zoom;
+    }
+    // Adds action for the rest of the input buttons
+    else
+    {
+        m_input.action_mask |= actionFromKey( _event.event.gamepad.button_id );
+    }
 }
 break;
 
-case tg::Input::eType::kKeyUp:
+// Remove action if button released
+case tg::Input::eType::kButtonUp:
 {
-    if( _event.event.keyboard.repeat == 0 ) 
-        m_input.action_mask &= ~actionFromKey( _event.event.keyboard.virtual_key );
+    m_input.action_mask &= ~actionFromKey( _event.event.gamepad.button_id );
 }
 break;
                                     </code></pre>
@@ -1559,6 +1583,9 @@ void cCameraController::move( const tg::cVector2f& _movement )
                                     </code></pre>
                                     <p class="game-text">Read input and update:</p>
                                     <pre id="code-section"><code class="language-cpp">
+// Checks if recieved action is currently in input action mask
+inline bool isActing( const sInput::eAction _action ) const { return ( m_input.action_mask & _action ) ? true : false; }
+
 // Check if any rotate input is being received and if currently not rotating
 // If so save current rotation and start rotating
 if( isActing( sInput::eAction::RotateLeft ) && !m_rotating_left && !m_rotating_right )
@@ -1631,17 +1658,236 @@ m_transform.update();
                                     <p class="highlight">Character base class</p>
                                     <p class="game-text">
                                         I decided to create a base class for a character that the player and enemy class would derive from, to simplify things
-                                        and not have to rewrite code that they would both need.
-                                        <br>
-                                         
+                                        and not have to rewrite code that they would both need. This includes a move function, a blend function for animations, 
+                                        and all the variables they would both need, such as model, animations, position and so on.
                                     </p>
-                                </div>
-                                <div>
-                                    <img style="max-width: 400px; max-height: 300px;" class="game-image"
-                                        src="images/Loading.png">
-                                    <p
-                                        style="line-height: 0; font-size: small; font-style: italic; margin-left: 50px; margin-top: 10px;">
-                                        Image discription.</p>
+                                    <p class="game-text">Walk function:</p>
+                                    <pre id="code-section"><code class="language-cpp">
+void cCharacter::walk( const float _delta_time )
+{
+    if( m_character_moves.empty() || m_tiles_moved + 1 == m_character_moves.size() )
+        return;
+
+    tg::cMatrix4x4f& modelMatrix = m_character_model->transform.local;
+    tg::cMatrix4x4f  look_at     = tg::Matrix4x4::lookAt( modelMatrix.pos(), 
+                                                        { ( float ) m_character_moves[ m_tiles_moved + 1 ].x, 
+                                                            0.0f, 
+                                                          ( float ) m_character_moves[ m_tiles_moved + 1 ].y }, 
+                                                          modelMatrix.up() );
+
+    modelMatrix = tg::Lerp::linear( modelMatrix, look_at, m_lerp_timer / ( m_time_between_points / 2 ) );
+
+    m_pos = tg::Lerp::linear( m_character_moves[ m_tiles_moved ],  
+                              m_character_moves[ m_tiles_moved + 1 ], 
+                              m_lerp_timer / m_time_between_points );
+
+    m_lerp_timer += _delta_time;
+
+    modelMatrix.pos() = { ( float ) m_pos.x, 0.0f, ( float ) m_pos.y };
+
+    if ( m_lerp_timer >= m_time_between_points )
+    {
+        m_lerp_timer = 0.0f;
+        m_pos = m_character_moves[ m_tiles_moved + 1 ];
+        m_tiles_moved++;
+    }
+}
+                                    </code></pre>
+                                    <p class="highlight">Player class</p>
+                                    <p class="game-text">
+                                        The players needed a bit more than the ability to walk. Firstly we needed a way to select where the players should walk.
+                                    </p>
+                                    <p class="game-text">Input for selecting path:</p>
+                                    <pre id="code-section"><code class="language-cpp">
+tg::cVector2<int> cPlayer::pickPath( const tg::cLine3f& _line )
+{
+    tg::cVector3f intersection = { };
+    if ( _line.intersect( tg::cPlane3f( { 0.0f, 1.0f, 0.0f }, 0.0f ), &intersection ) )
+    {
+        tg::cVector2< int > grid_pos = { ( int ) tg::MathCE::round( intersection.x / ( float ) m_map->m_spacing ), ( int ) tg::MathCE::round( intersection.z / ( float ) m_map->m_spacing ) };
+        if ( m_map->hasTile( grid_pos ) )
+        {
+            m_path_selected = true;
+            m_map->m_chosen_coords.push_back( grid_pos );
+            return grid_pos;
+        }
+        else
+        {
+            m_path_selected = false;
+        }
+    }
+    return { };
+}
+
+void cPlayer::onRawInput( const sRawInputEvent& _event )
+{
+    ...
+
+    case tg::Input::eType::kButtonDown:
+    {
+        if ( _event.event.gamepad.button_id == SCE_PAD_BUTTON_SQUARE )
+        {
+            const tg::cCamera& camera_3d = cApplication::instance().getCamera3D().getCamera();
+
+            m_aim_line = { camera_3d.transform.world.pos(), camera_3d.transform.world.at() };
+
+            if ( m_character_moves.size() > 0 )
+            {
+                auto end_tile = m_character_moves[ m_character_moves.size() - 1 ] / m_map->m_spacing;
+                auto it = std::find_if( m_map->m_chosen_coords.begin(), m_map->m_chosen_coords.end(), [end_tile]( const auto& _chosen_pos ) { return _chosen_pos == end_tile; } );
+                if ( it == m_map->m_chosen_coords.end() )
+                {
+                    m_character_moves.clear();
+                    return;
+                }
+                m_map->m_chosen_coords.erase( it );
+            }
+            m_character_moves = m_map->searchPath( { ( int ) tg::MathCE::round( m_pos.x / 80 ), ( int ) tg::MathCE::round( m_pos.y / 80 ) }, pickPath( m_aim_line ) );
+        }
+    }
+    break;
+
+    ...
+}
+                                    </code></pre>
+                                    <p class="game-text">
+                                        Then I had to implement the update function to update the players depending on their current state.
+                                    </p>
+                                    <p class="game-text">State handler:</p>
+                                    <pre id="code-section"><code class="language-cpp">
+switch( m_current_state )
+{
+case cCharacter::CAUGHT:
+    return; // Do nothing, player unplayable
+
+case cCharacter::IDLE:
+
+    // Play idle animation
+    m_idle_interpolator->addTime( _delta_time, true, true );
+    m_prev_interpolator = m_next_interpolator;
+    m_next_interpolator = m_idle_interpolator;
+    break;
+
+case cCharacter::WALKING:
+
+    // Walking animations varied in walking speed
+    // Check for all 3 players to multiply correctly
+    if( m_name == "ricky" )
+        m_walk_interpolator->addTime( _delta_time * 2, true, true );
+    else if( m_name == "algott" )
+        m_walk_interpolator->addTime( _delta_time * 1.5f, true, true );
+    else if( m_name == "al" )
+        m_walk_interpolator->addTime( _delta_time * 3, true, true );
+
+    m_prev_interpolator = m_next_interpolator;
+    m_next_interpolator = m_walk_interpolator;
+    // Make player walk
+    walk( _delta_time );
+    // Check if destination is reached or if player has not moved
+    if( m_character_moves.empty() || m_tiles_moved + 1 == m_character_moves.size() )
+    {
+        // Set state to idle and reset move related variables
+        m_current_state   = IDLE;
+        m_finished_moves  = true;
+        m_path_selected   = false;
+        m_character_moves = { };
+        m_tiles_moved     = 0;
+    }
+    break;
+
+case cCharacter::CATCHING: // Being caught
+
+    // Play idle animation
+    m_catching_interpolator->addTime( _delta_time * 1.5f, true, true );
+    m_prev_interpolator = m_next_interpolator;
+    m_next_interpolator = m_catching_interpolator;
+    m_catch_timer += _delta_time;
+    if( m_catch_timer >= 3.0f )
+    {
+        // When animation finished, move player out of frame and set state to caught
+        m_current_state  = CAUGHT;
+        m_character_model->transform.local.pos() = { -8000.0f, 0.0f, -8000.0f };
+        m_character_model->transform.update();
+        m_finished_moves = true;
+        m_path_selected  = false;
+        m_pos            = { -8000, -8000 };
+    }
+    break;
+
+case cCharacter::INTERACTING:
+
+    // Play interacting animation
+    m_interact_interpolator->addTime( _delta_time, true, true );
+    m_prev_interpolator = m_next_interpolator;
+    m_next_interpolator = m_interact_interpolator;
+    m_interact_interpolator->end_of_animation_callback = interactCallBack;
+    break;
+
+}
+                                    </code></pre>
+                                    <p class="game-text">
+                                        Now the players could be controlled, they could move, interact and get caught which was all they were supposed to do.
+                                    </p>
+                                    <p class="highlight">Enemy class</p>
+                                    <p class="game-text">
+                                        For the enemy, I had to implement a very simple AI instead of path choosing to make the patrol through pseudo random
+                                        routes. For this, I chose to have a predetermined set of guards with all patrol points already made out, and make them
+                                        patrol between them. But when they reach a point, a random one is chosen, so the player doesn't konw where the guard
+                                        will go if they has played a couple of rounds.
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+case cCharacter::WALKING:
+
+m_walk_interpolator->addTime( _delta_time, true, true );
+m_prev_interpolator = m_next_interpolator;
+m_next_interpolator = m_walk_interpolator;
+walk( _delta_time );
+if( m_character_moves.empty() || m_tiles_moved + 1 == m_character_moves.size() )
+{
+    // Choose next path randomly
+    m_character_moves = m_map->searchPath( { ( int )tg::MathCE::round( m_pos.x / m_map->m_spacing ), 
+                                             ( int )tg::MathCE::round( m_pos.y / m_map->m_spacing ) }, 
+                                            m_patrol_points[ rand() % m_patrol_points.size() ] );
+    m_tiles_moved = 0;
+}
+break;
+                                    </code></pre>
+                                    <p class="game-text">
+                                        To be able to catch a player, the enemy needed vision, this was my solution:
+                                    </p>
+                                    <pre id="code-section"><code class="language-cpp">
+void cEnemy::checkVision( cPlayer* _player, cLevel* _level )
+{
+    // Get line between enemy and player
+    tg::cVector3f this_at       = m_character_model->transform.world.at();
+    tg::cVector3f this_to_other =   tg::cVector3f{ static_cast< float >( _player->getPos().x ), 0.0f,  static_cast< float >( _player->getPos().y ) } - tg::cVector3f{ static_cast< float >( m_pos.x ), 0.0f,  static_cast< float >( m_pos.y ) };
+    tg::cLine3f   tto_line      = { tg::cVector3f{ static_cast< float >( _player->getPos().x ), 40.0f, static_cast< float >( _player->getPos().y ) },  tg::cVector3f{ static_cast< float >( m_pos.x ), 40.0f, static_cast< float >( m_pos.y ) } };
+
+    #if defined( TG_PLATFORM_WINDOWS ) && ( DEBUG )
+    tg::cDebugLines::getInstance().add3D( tto_line, tg::Color::kAqua );
+    #endif
+
+    if( tto_line.length() > 7 * m_map->m_spacing )
+        return;
+
+    std::vector< sNode* > collision_nodes = _level->getNodesOfType(sNode::eType::kCollider);
+    tg::cCollision collision_object;
+    collision_object.type = tg::Mesh::eType::kModel;
+
+    for( auto& collision_node : collision_nodes )
+    {
+        if( collision_object.lineAllMeshesInModel( tto_line, *collision_node->data.collision_model ) )
+            return;
+    }
+
+    if( tg::MathCE::radToDeg( tg::Math::acos( this_to_other.normalize().dot( this_at ) ) ) < 25.0f )
+    {
+        _player->setState( CATCHING );
+        if( m_current_state != CATCHING )
+            m_current_state  = CATCHING;
+    }
+}
+                                    </code></pre>
                                 </div>
                             </div>
                         </div>
@@ -1654,6 +1900,13 @@ m_transform.update();
                                     hic quasi quibusdam, laboriosam consequuntur? Odio a unde labore eos culpa veniam
                                     molestias harum, error quod animi quia assumenda?
                                 </p>
+                            </div>
+                            <div>
+                                <img style="max-width: 400px; max-height: 300px;" class="game-image"
+                                    src="images/Loading.png">
+                                <p
+                                    style="line-height: 0; font-size: small; font-style: italic; margin-left: 50px; margin-top: 10px;">
+                                    Image discription.</p>
                             </div>
                         </div>
 
