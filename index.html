@@ -115,10 +115,11 @@
                                         <br>
                                         When I'm not programming, I am probably playing games. Or I could be playing the piano, riding skateboard or looking at
                                         listings of cars I can't afford.
-                                    </p>
-                                    <p class="game-text">
-                                        If you want to know more, feel free to contact me on my socials or mail at <a id="mail-link"
-                                            href="mailto:jensenmarkus.04@gmail.com"><strong>jensenmarkus.04@gmail.com</strong></a>
+                                        <br>
+                                        <br>
+                                        If you want to know more, feel free to contact me on my socials or mail at 
+                                        <br>
+                                        <a id="mail-link" href="mailto:jensenmarkus.04@gmail.com"><strong>jensenmarkus.04@gmail.com</strong></a>
                                     </p>
                                 </div>
                             </div>
@@ -297,12 +298,9 @@
                         <!-- START CARD BestLaidSchemes-->
                         <button type="button" class="project-card section-trigger" data-section="BestLaidSchemes">
                             <section>
-                                <div class="project-video" :before>
-                                    <video playsinline loop autoplay preload="metadata" muted>
-                                        <source src="videos/DriveBackSanJuegoTrailer.mp4" type="video/mp4">
-                                        " Your browser does not support the video tag or the file format of this video.
-                                        "
-                                    </video>
+                                <div>
+                                    <img class="project-video"
+                                            src="images/BestLaidSchemesLogo.png">
                                 </div>
                                 <div class="video-additional-info">
                                     <div class="team-size">
@@ -1421,7 +1419,7 @@ void ASpellDungeonPlayer::SmoothPoints( TArray< FMyPoint* >& points )
                     <div class="portfolio-top">
                         <div class="content-placeholder" :before>
                             <video playsinline loop autoplay preload="metadata" muted>
-                                <source src="videos/DriveBackSanJuegoGameplay.mp4" type="video/mp4">
+                                <source src="videos/" type="video/mp4">
                                 Your browser does not support the video tag or the file format of this video.
                             </video>
                         </div>
@@ -1694,6 +1692,29 @@ void cCharacter::walk( const float _delta_time )
 }
                                     </code></pre>
                                     <p class="highlight">Player class</p>
+                                    <div class="game-information">
+                                        <div>
+                                            <img style="max-width: 400px; max-height: 300px;" class="game-image"
+                                                src="images/Loading.png">
+                                            <p
+                                                style="line-height: 0; font-size: small; font-style: italic; margin-left: 40px; margin-top: 10px; margin-bottom: 10px;">
+                                                Ricky</p>
+                                        </div>
+                                        <div>
+                                            <img style="max-width: 400px; max-height: 300px;" class="game-image"
+                                                src="images/Loading.png">
+                                            <p
+                                                style="line-height: 0; font-size: small; font-style: italic; margin-left: 40px; margin-top: 10px; margin-bottom: 10px;">
+                                                Älgott</p>
+                                        </div>
+                                        <div>
+                                            <img style="max-width: 400px; max-height: 300px;" class="game-image"
+                                                src="images/Loading.png">
+                                            <p
+                                                style="line-height: 0; font-size: small; font-style: italic; margin-left: 40px; margin-top: 10px; margin-bottom: 10px;">
+                                                Al</p>
+                                        </div>
+                                    </div>
                                     <p class="game-text">
                                         The players needed a bit more than the ability to walk. Firstly we needed a way to select where the players should walk.
                                     </p>
@@ -1829,6 +1850,29 @@ case cCharacter::INTERACTING:
                                         Now the players could be controlled, they could move, interact and get caught which was all they were supposed to do.
                                     </p>
                                     <p class="highlight">Enemy class</p>
+                                    <div class="game-information">
+                                        <div>
+                                            <img style="max-width: 400px; max-height: 300px;" class="game-image"
+                                                src="images/Loading.png">
+                                            <p
+                                                style="line-height: 0; font-size: small; font-style: italic; margin-left: 40px; margin-top: 10px; margin-bottom: 10px;">
+                                                Guards</p>
+                                        </div>
+                                        <div>
+                                            <img style="max-width: 400px; max-height: 300px;" class="game-image"
+                                                src="images/Loading.png">
+                                            <p
+                                                style="line-height: 0; font-size: small; font-style: italic; margin-left: 40px; margin-top: 10px; margin-bottom: 10px;">
+                                                Guard vision</p>
+                                        </div>
+                                        <div>
+                                            <img style="max-width: 400px; max-height: 300px;" class="game-image"
+                                                src="images/Loading.png">
+                                            <p
+                                                style="line-height: 0; font-size: small; font-style: italic; margin-left: 40px; margin-top: 10px; margin-bottom: 10px;">
+                                                Guard catching</p>
+                                        </div>
+                                    </div>
                                     <p class="game-text">
                                         For the enemy, I had to implement a very simple AI instead of path choosing to make the patrol through pseudo random
                                         routes. For this, I chose to have a predetermined set of guards with all patrol points already made out, and make them
@@ -1860,26 +1904,36 @@ void cEnemy::checkVision( cPlayer* _player, cLevel* _level )
 {
     // Get line between enemy and player
     tg::cVector3f this_at       = m_character_model->transform.world.at();
-    tg::cVector3f this_to_other =   tg::cVector3f{ static_cast< float >( _player->getPos().x ), 0.0f,  static_cast< float >( _player->getPos().y ) } - tg::cVector3f{ static_cast< float >( m_pos.x ), 0.0f,  static_cast< float >( m_pos.y ) };
-    tg::cLine3f   tto_line      = { tg::cVector3f{ static_cast< float >( _player->getPos().x ), 40.0f, static_cast< float >( _player->getPos().y ) },  tg::cVector3f{ static_cast< float >( m_pos.x ), 40.0f, static_cast< float >( m_pos.y ) } };
+    tg::cVector3f this_to_other = tg::cVector3f{ static_cast< float >( _player->getPos().x ), 
+                                                 0.0f,  
+                                                 static_cast< float >( _player->getPos().y ) } - 
+                                  tg::cVector3f{ static_cast< float >( m_pos.x ), 
+                                                 0.0f, 
+                                                 static_cast< float >( m_pos.y ) };
+    tg::cLine3f   tto_line = { tg::cVector3f{ static_cast< float >( _player->getPos().x ), 
+                                              40.0f, 
+                                              static_cast< float >( _player->getPos().y ) },  
+                               tg::cVector3f{ static_cast< float >( m_pos.x ), 
+                                              40.0f, 
+                                              static_cast< float >( m_pos.y ) } };
 
-    #if defined( TG_PLATFORM_WINDOWS ) && ( DEBUG )
-    tg::cDebugLines::getInstance().add3D( tto_line, tg::Color::kAqua );
-    #endif
-
+    // If player is more than 7 tiles away from the enemy, not visible
     if( tto_line.length() > 7 * m_map->m_spacing )
         return;
 
+    // Check collision on line
     std::vector< sNode* > collision_nodes = _level->getNodesOfType(sNode::eType::kCollider);
     tg::cCollision collision_object;
     collision_object.type = tg::Mesh::eType::kModel;
 
     for( auto& collision_node : collision_nodes )
     {
+        // If line collides with something, player is not visible
         if( collision_object.lineAllMeshesInModel( tto_line, *collision_node->data.collision_model ) )
             return;
     }
 
+    // If player is within 25 degrees to the left or 25 degrees to the right, enemy catch the player
     if( tg::MathCE::radToDeg( tg::Math::acos( this_to_other.normalize().dot( this_at ) ) ) < 25.0f )
     {
         _player->setState( CATCHING );
@@ -1896,17 +1950,17 @@ void cEnemy::checkVision( cPlayer* _player, cLevel* _level )
                             <h2 class="gameDesch2">Conclusion</h2>
                             <div class="game-information">
                                 <p class="game-text">
-                                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Deleniti ratione reprehenderit
-                                    hic quasi quibusdam, laboriosam consequuntur? Odio a unde labore eos culpa veniam
-                                    molestias harum, error quod animi quia assumenda?
+                                    Since this project was my first ever group project, I have learned a lot from it. I've learned the basics of creating a
+                                    game in a group, how to coordinate and help each other, and the overall idea of how to develop a game in a group. The 
+                                    project was also made with our schools in-house engine, where we had to build every system, feature, mechanic and so on, 
+                                    from the ground up, all without any documentation. This was very challenging for a small group of fairly new programmers, 
+                                    and therefore very giving experience wise since we completed the task and finished our game in the short timeframe. 
+                                    <br>
+                                    Because of the limited amount of time, we had to make some compromises and cut a few ideas, which was sad during development 
+                                    since we all wanted to make all of our ideas, but in hindsight, it was a very usefull skill to learn. 
+                                    <br> 
+
                                 </p>
-                            </div>
-                            <div>
-                                <img style="max-width: 400px; max-height: 300px;" class="game-image"
-                                    src="images/Loading.png">
-                                <p
-                                    style="line-height: 0; font-size: small; font-style: italic; margin-left: 50px; margin-top: 10px;">
-                                    Image discription.</p>
                             </div>
                         </div>
 
