@@ -1649,26 +1649,31 @@ m_transform.update();
                                     <pre id="code-section"><code class="language-cpp">
 void cCharacter::walk( const float _delta_time )
 {
+    // If destination reached, don't continue
     if( m_character_moves.empty() || m_tiles_moved + 1 == m_character_moves.size() )
         return;
 
+    // Get model matrix and make it look to the next tile in its path
     tg::cMatrix4x4f& modelMatrix = m_character_model->transform.local;
     tg::cMatrix4x4f  look_at     = tg::Matrix4x4::lookAt( modelMatrix.pos(), 
                                                         { ( float ) m_character_moves[ m_tiles_moved + 1 ].x, 
                                                             0.0f, 
                                                           ( float ) m_character_moves[ m_tiles_moved + 1 ].y }, 
                                                           modelMatrix.up() );
-
+    // Lerp to make turning smoother
     modelMatrix = tg::Lerp::linear( modelMatrix, look_at, m_lerp_timer / ( m_time_between_points / 2 ) );
 
+    // Lerp position to make character walk to the next tile
     m_pos = tg::Lerp::linear( m_character_moves[ m_tiles_moved ],  
                               m_character_moves[ m_tiles_moved + 1 ], 
                               m_lerp_timer / m_time_between_points );
 
     m_lerp_timer += _delta_time;
 
+    // Update the matrix position
     modelMatrix.pos() = { ( float ) m_pos.x, 0.0f, ( float ) m_pos.y };
 
+    // If tile is reached, reset variables to continue to next tile or stop
     if ( m_lerp_timer >= m_time_between_points )
     {
         m_lerp_timer = 0.0f;
@@ -1709,17 +1714,25 @@ void cCharacter::walk( const float _delta_time )
 tg::cVector2<int> cPlayer::pickPath( const tg::cLine3f& _line )
 {
     tg::cVector3f intersection = { };
+
+    // Check if ray from camera intersects with the ground plane
     if ( _line.intersect( tg::cPlane3f( { 0.0f, 1.0f, 0.0f }, 0.0f ), &intersection ) )
     {
-        tg::cVector2< int > grid_pos = { ( int ) tg::MathCE::round( intersection.x / ( float ) m_map->m_spacing ), ( int ) tg::MathCE::round( intersection.z / ( float ) m_map->m_spacing ) };
+        // Save intersection point
+        tg::cVector2< int > grid_pos = { ( int ) tg::MathCE::round( intersection.x / ( float ) m_map->m_spacing ), 
+                                         ( int ) tg::MathCE::round( intersection.z / ( float ) m_map->m_spacing ) };
+
+        // Check if tile exists using an external function
         if ( m_map->hasTile( grid_pos ) )
         {
+            // If so, return selected tile
             m_path_selected = true;
             m_map->m_chosen_coords.push_back( grid_pos );
             return grid_pos;
         }
         else
         {
+            // If not, return nothing and path is not selected
             m_path_selected = false;
         }
     }
@@ -1732,24 +1745,38 @@ void cPlayer::onRawInput( const sRawInputEvent& _event )
 
     case tg::Input::eType::kButtonDown:
     {
+        // Select path button
         if ( _event.event.gamepad.button_id == SCE_PAD_BUTTON_SQUARE )
         {
+            // Get camera and its direction
             const tg::cCamera& camera_3d = cApplication::instance().getCamera3D().getCamera();
-
             m_aim_line = { camera_3d.transform.world.pos(), camera_3d.transform.world.at() };
 
+            // Check if character has tiles selected
             if ( m_character_moves.size() > 0 )
             {
+                // Get the last tile in selected path
                 auto end_tile = m_character_moves[ m_character_moves.size() - 1 ] / m_map->m_spacing;
-                auto it = std::find_if( m_map->m_chosen_coords.begin(), m_map->m_chosen_coords.end(), [end_tile]( const auto& _chosen_pos ) { return _chosen_pos == end_tile; } );
+
+                // Return iterator for end tile in m_chosen_coords
+                auto it = std::find_if( m_map->m_chosen_coords.begin(), 
+                                        m_map->m_chosen_coords.end(), 
+                                        [end_tile]( const auto& _chosen_pos ) { return _chosen_pos == end_tile; } );
+
+                // If end_tile does not exist in m_chosen_coords
                 if ( it == m_map->m_chosen_coords.end() )
                 {
+                    // Clear current selected path
                     m_character_moves.clear();
                     return;
                 }
+                // Remove end_tile as a chosen coord since a new coordinate will be chosen
                 m_map->m_chosen_coords.erase( it );
             }
-            m_character_moves = m_map->searchPath( { ( int ) tg::MathCE::round( m_pos.x / 80 ), ( int ) tg::MathCE::round( m_pos.y / 80 ) }, pickPath( m_aim_line ) );
+            // Find a path using an A* pathfinding algorithm
+            m_character_moves = m_map->searchPath( { ( int ) tg::MathCE::round( m_pos.x / 80 ), 
+                                                     ( int ) tg::MathCE::round( m_pos.y / 80 ) }, 
+                                                    pickPath( m_aim_line ) );
         }
     }
     break;
@@ -1896,12 +1923,12 @@ void cEnemy::checkVision( cPlayer* _player, cLevel* _level )
                                   tg::cVector3f{ static_cast< float >( m_pos.x ), 
                                                  0.0f, 
                                                  static_cast< float >( m_pos.y ) };
-    tg::cLine3f   tto_line = { tg::cVector3f{ static_cast< float >( _player->getPos().x ), 
-                                              40.0f, 
-                                              static_cast< float >( _player->getPos().y ) },  
-                               tg::cVector3f{ static_cast< float >( m_pos.x ), 
-                                              40.0f, 
-                                              static_cast< float >( m_pos.y ) } };
+    tg::cLine3f tto_line = { tg::cVector3f{ static_cast< float >( _player->getPos().x ), 
+                                            40.0f, 
+                                            static_cast< float >( _player->getPos().y ) },  
+                             tg::cVector3f{ static_cast< float >( m_pos.x ), 
+                                            40.0f, 
+                                            static_cast< float >( m_pos.y ) } };
 
     // If player is more than 7 tiles away from the enemy, not visible
     if( tto_line.length() > 7 * m_map->m_spacing )
