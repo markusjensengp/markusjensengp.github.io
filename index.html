@@ -922,7 +922,8 @@ SuspensionFL->SetAngularOrientationTarget( FRotator( 0, Angle + WheelDmgRotFL, 0
                                 <div>
                                     <p class="game-text">
                                         At first I had to create an algorithm for resizing and resampling shapes into a set number of points so the recognizing
-                                        algorithm takes in two similar shapes.
+                                        algorithm takes in two similar shapes, which it then campares all points in both shapes to each other and finds the 
+                                        template with the shortest distance between all points.
                                     </p>
                                     <p class="highlight">Resampling process</p>
                                     <p class="game-text">
