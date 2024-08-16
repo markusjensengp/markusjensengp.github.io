@@ -113,8 +113,8 @@
                                         for programming during my second year in high school when I had an introduction course in python. After that, I've just
                                         been learning more and more during my 3 years of programming.
                                         <br>
-                                        When I'm not programming, I am probably playing games. Or I could be playing the piano, riding skateboard or looking at
-                                        listings of cars I can't afford.
+                                        When I'm not programming, I am probably playing games. I could also be doing anything car related, playing the piano, or 
+                                        riding my skateboard.
                                         <br>
                                         <br>
                                         If you want to know more, feel free to contact me on my socials or mail at 
@@ -366,7 +366,7 @@
                         <section class="project-card">
                             <h3 class="clickable-card-header" :not>
                                 Karlfeldtgymnasiet (2020 - 2023)
-                                <small>High school diploma specializing in IT (HTML / CSS, C# and Python)</small>
+                                <small>High school diploma specializing in IT ( C#, Python and HTML / CSS )</small>
                             </h3>
                         </section>
                     </div>
@@ -381,7 +381,6 @@
                         <li class="badge">Unreal Engine</li>
                         <li class="badge">Blueprints</li>
                         <li class="badge">Fast learning</li>
-                        <li class="badge">Adapting</li>
                     </ul>
 
                 </section>
@@ -485,7 +484,7 @@
                             <h2 class="gameDesch2">My Contribution</h2>
                             <div class="game-information">
                                 <p class="game-text">
-                                    The larger team size and a more advanced game engine that we used for this project, allowed me to really focus on what I
+                                    The larger team size and a more advanced game engine that we used for this project allowed me to really focus on what I
                                     like to do, which is gameplay programming. And I had the opportunity to focus on the car controller for the entirety of
                                     the project.
                                     </br>
@@ -503,10 +502,11 @@
                                         Since my only responsibility was the car controller, I had time to continue evolving it once I had completed the feature
                                         I was previously working on. Therefore there are a lot of features added to the car controller, considering the
                                         timeframe we had, including:
-                                        <br>
+                                    </p>
+                                    <p class="game-text">
                                         - Realistic suspension using UE5 physics constraints
                                         <br>
-                                        - Gearbox simulation with adjustable gfear ratios
+                                        - Gearbox simulation with adjustable gear ratios
                                         <br>
                                         - Adjustable automatic gearbox values (shift up/down RPM, shift time)
                                         <br>
@@ -516,7 +516,7 @@
                                         <br>
                                         - RPM depending on wheel angular rotation
                                         <br>
-                                        - Anti-rollbars with adjustable stiffness
+                                        - Anti-roll bars with adjustable stiffness
                                         <br>
                                         - Togglable ABS
                                         <br>
@@ -675,8 +675,8 @@ switch ( DriveTrain )
 
 TargetRPM = ConnectedWheelRPM * AxleRatio * GearRatios[ CurrentGear ];
                                     </code></pre>
-                                    <p class="highlight">Anti-rollbars with adjustable stiffness </p>
-                                    <p class="game-text">The anti-rollbars are designed to counteract body roll during cornering by balancing the forces between
+                                    <p class="highlight">Anti-roll bars with adjustable stiffness </p>
+                                    <p class="game-text">The anti-roll bars are designed to counteract body roll during cornering by balancing the forces between
                                         the left and right suspension components. The code compares the forces on the left and right sides for both the front and rear
                                         suspensions. If the force on one side is less than its counterpart on the opposite side, it adjusts the force by
                                         multiplying the counterpart's force with a stiffness factor (ranging from 0 to 1). This helps even out the suspension
@@ -1037,7 +1037,7 @@ void Gesture::Scale( TArray< FMyPoint >& points )
 }
                                     </code></pre>
                                     <p class="game-text">
-                                        Translating the shape to be centered at coordinates (0, 0), I first had to find the centroid of the shape.
+                                        To translate the shape to be centered at coordinates (0, 0), I first had to find the centroid of the shape.
                                     </p>
                                     <p class="game-text">
                                         Centroid function:
@@ -1075,6 +1075,9 @@ void Gesture::TranslateTo( TArray< FMyPoint >& points, FMyPoint centroid )
 }
                                     </code></pre>
                                     <p class="highlight">Recognition</p>
+                                    <p class="game-text">
+                                        During recognition, the algorithm compares all of path a's points to all of path b's, and matches the closest one.
+                                    </p>
                                     <p class="game-text">
                                         Finds distance between each point in your drawn shape and a template shape:
                                     </p>
@@ -1228,7 +1231,7 @@ FString Recognizer::Recognize( const TArray< FMyPoint >& candidate_points )
                                     </code></pre>
                                     <p class="highlight">Painting and saving</p>
                                     <p class="game-text">
-                                        To draw shapes I decided to make a painting widget that stores all points retrieved in the player's Tick. 
+                                        To draw shapes I decided to make a painting widget that stores all points that are retrieved in the player's Tick. 
                                     </p>
                                     <p class="game-text">
                                         If the player is painting: 
@@ -1285,7 +1288,7 @@ void ASpellDungeonPlayer::AddTemplateToDataTable( const FString Name )
 
     const int row_num = rows.Num() + 1;
 
-    // Adds template to an the templates data table
+    // Adds template to the templates data table
     m_template_table->AddRow( FName( *FString::FromInt( row_num ) ), data_row );
 
     // Adds template to an array in the recognizer object
@@ -1379,13 +1382,13 @@ void ASpellDungeonPlayer::SmoothPoints( TArray< FMyPoint* >& points )
                                 <p class="game-text">
                                     This solo project has taught me more about Unreal Engine and all of it's countless features. I've learned about widgets
                                     as well as data tables and some things about other ways of storing data. My initial goal with this project was to learn
-                                    about gesture recognizing, and making a good controller for it, which I did. But I have learned more about the engine 
-                                    itself than I have about gesture recognizing. I have also learned a bit about pen stabilizers and how they work, which 
-                                    I had no intention of when I first started this project.
+                                    only about gesture recognizing, and making a controller for it. But I have learned much more about the engine than I 
+                                    thought I would. I have also learned a bit about pen stabilizers and how they work, which I had no intention of when 
+                                    I first started this project.
                                 </br>
                                 </br>
                                     My outtake from this project is that projects don't always end up like planned, but you will always learn something, even 
-                                    if it's not what you had planned on learning.
+                                    if it's not what you had planned.
                                 </p>
                             </div>
                         </div>
@@ -1571,7 +1574,7 @@ void cCameraController::move( const tg::cVector2f& _movement )
 inline bool isActing( const sInput::eAction _action ) const { return ( m_input.action_mask & _action ) ? true : false; }
 
 // Check if any rotate input is being received and if currently not rotating
-// If so save current rotation and start rotating
+// If so, save current rotation and start rotating
 if( isActing( sInput::eAction::RotateLeft ) && !m_rotating_left && !m_rotating_right )
 {
     m_rotating_left = true;
@@ -1583,7 +1586,7 @@ if( isActing( sInput::eAction::RotateRight ) && !m_rotating_left && !m_rotating_
     m_initial_rotation = m_rotation.y;
 }
 
-// If rotating lerp from initial rotation to 90 degrees less or more
+// If rotating, lerp from initial rotation to 90 degrees less or more
 if( m_rotating_left )
 {
     m_timer += _delta_time;
@@ -1745,7 +1748,7 @@ void cPlayer::onRawInput( const sRawInputEvent& _event )
 
     case tg::Input::eType::kButtonDown:
     {
-        // Select path button
+        // Select path button is pressed
         if ( _event.event.gamepad.button_id == SCE_PAD_BUTTON_SQUARE )
         {
             // Get camera and its direction
@@ -1815,8 +1818,10 @@ case cCharacter::WALKING:
 
     m_prev_interpolator = m_next_interpolator;
     m_next_interpolator = m_walk_interpolator;
+
     // Make player walk
     walk( _delta_time );
+
     // Check if destination is reached or if player has not moved
     if( m_character_moves.empty() || m_tiles_moved + 1 == m_character_moves.size() )
     {
@@ -1831,7 +1836,7 @@ case cCharacter::WALKING:
 
 case cCharacter::CATCHING: // Being caught
 
-    // Play idle animation
+    // Play getting caught animation
     m_catching_interpolator->addTime( _delta_time * 1.5f, true, true );
     m_prev_interpolator = m_next_interpolator;
     m_next_interpolator = m_catching_interpolator;
@@ -1887,10 +1892,10 @@ case cCharacter::INTERACTING:
                                         </div>
                                     </div>
                                     <p class="game-text">
-                                        For the enemy, I had to implement a very simple AI instead of path choosing to make the patrol through pseudo random
+                                        For the enemy, I had to implement a very simple AI instead of path choosing to make them patrol through pseudo random
                                         routes. For this, I chose to have a predetermined set of guards with all patrol points already made out, and make them
-                                        patrol between them. But when they reach a point, a random one is chosen, so the player doesn't konw where the guard
-                                        will go if they has played a couple of rounds.
+                                        patrol between them. But when they reach a point, a random one is chosen, so the player doesn't know where the guard
+                                        will go if they have played a couple of rounds.
                                     </p>
                                     <pre id="code-section"><code class="language-cpp">
 case cCharacter::WALKING:
@@ -1941,7 +1946,7 @@ void cEnemy::checkVision( cPlayer* _player, cLevel* _level )
 
     for( auto& collision_node : collision_nodes )
     {
-        // If line collides with something, player is not visible
+        // If line collides with something (wall, statue), player is not visible
         if( collision_object.lineAllMeshesInModel( tto_line, *collision_node->data.collision_model ) )
             return;
     }
@@ -1964,10 +1969,11 @@ void cEnemy::checkVision( cPlayer* _player, cLevel* _level )
                             <div class="game-information">
                                 <p class="game-text">
                                     Since this project was my first ever group project, I have learned a lot from it. I've learned the basics of creating a
-                                    game in a group, how to coordinate and help each other, and the overall idea of how to develop a game in a group. The 
-                                    project was also made with our schools in-house engine, where we had to build every system, feature, mechanic and so on, 
+                                    game in a group, how to coordinate and help each other, and the overall idea of how to develop a game. The project 
+                                    was also made with our schools in-house engine, where we had to build every system, feature, mechanic and so on, 
                                     from the ground up, all without any documentation. This was very challenging for a small group of fairly new programmers, 
-                                    and therefore very giving experience wise since we completed the task and finished our game in the short timeframe. 
+                                    but also a very giving experience since we completed the challenges and finished our game in the short timeframe. 
+                                    <br>
                                     <br>
                                     Because of the limited amount of time, we had to make some compromises and cut a few ideas, which was sad during development 
                                     since we all wanted to make all of our ideas, but in hindsight, it was a very usefull skill to learn. 
