@@ -611,6 +611,13 @@ textarea {
     top: 0
 }
 
+.portfolio-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap
+}
+
 .portfolio-top video {
     width: 100%;
     border-top-left-radius: 5px;
@@ -1508,15 +1515,8 @@ body.isHome .goHomeButton {
     display: none;
 }
 
-.goHomeButton {
-    display: flex;
-    height: 80px;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-}
-
 .goHomeButton button {
+    margin-top: 15px;
     padding: 0px 30px;
     height: 45px;
     background-color: #c095da;
