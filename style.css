@@ -1519,6 +1519,7 @@ body.isHome .goHomeButton {
     margin-top: 15px;
     padding: 0px 30px;
     height: 45px;
+    width: 195px;
     background-color: #c095da;
     border: 0;
     cursor: pointer;
