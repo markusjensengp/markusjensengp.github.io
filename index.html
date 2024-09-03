@@ -1548,13 +1548,13 @@ break;
 case tg::Input::eType::kButtonDown:
 {
     // Checks for zoom input
-    if( _event.event.gamepad.button_id == SCE_PAD_BUTTON_L2 )
+    if( _event.event.gamepad.button_id == BUTTON_L2 )
     {
         m_time_since_change = 0;
         m_target_zoom       = tg::MathCE::clamp( m_min_zoom, m_target_zoom + 1, m_max_zoom );
         m_start_zoom        = m_current_zoom;
     }
-    else if( _event.event.gamepad.button_id == SCE_PAD_BUTTON_R2 )
+    else if( _event.event.gamepad.button_id == BUTTON_R2 )
     {
         m_time_since_change = 0;
         m_target_zoom       = tg::MathCE::clamp( m_min_zoom, m_target_zoom - 1, m_max_zoom);
@@ -1767,7 +1767,7 @@ void cPlayer::onRawInput( const sRawInputEvent& _event )
     case tg::Input::eType::kButtonDown:
     {
         // Select path button is pressed
-        if ( _event.event.gamepad.button_id == SCE_PAD_BUTTON_SQUARE )
+        if ( _event.event.gamepad.button_id == BUTTON_SQUARE )
         {
             // Get camera and its direction
             const tg::cCamera& camera_3d = cApplication::instance().getCamera3D().getCamera();
@@ -2023,7 +2023,7 @@ void cEnemy::checkVision( cPlayer* _player, cLevel* _level )
                                 </svg>
                             </a>
 
-                            <a class="link" href="" target="_blank" title="Mail"><span class="sr-only">Mail</span>
+                            <a class="link" href="mailto:jensenmarkus.04@gmail.com" target="_blank" title="Mail"><span class="sr-only">Mail</span>
                                 <svg width="56px" height="42px" viewBox="-1.2 -1.2 26.40 26.40" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <g id="SVGRepo_bgCarrier" stroke-width="0">
