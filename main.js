@@ -1,8 +1,20 @@
 // main.js - Shared scripts for all pages
 
+// Initialize after DOM content is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  
+  setupFadeSections();
+  setupDropdowns();
+  // Fade in hero scroll icon after 1s
+  setTimeout(function() {
+    var scrollIcon = document.querySelector('.hero-scroll-icon');
+    if (scrollIcon) scrollIcon.classList.add('visible');
+  }, 1000);
+});
+
 // Fade-in/out on scroll for all sections except hero
 function setupFadeSections() {
-  const fadeSections = document.querySelectorAll('.skills-section, .timeline-section, .projects-section, #about');
+  const fadeSections = document.querySelectorAll('.skills-section, .timeline-section, .projects-section, .project-contributions, .section-title, .project-layout, #about');
   fadeSections.forEach(sec => {
     sec.classList.add('fade-section');
     sec.style.visibility = 'hidden';
@@ -41,17 +53,17 @@ function setupDropdowns() {
   document.querySelectorAll('#snippet').forEach(btn => {
     btn.addEventListener('click', function() {
       const content = this.nextElementSibling;
-      content.style.display = content.style.display === 'block' ? 'none' : 'block';
+      if (content.style.display === 'block') {
+        content.style.display = 'none';
+      } else {
+        content.style.display = 'block';
+        // Highlight code blocks inside this snippet if not already highlighted
+        content.querySelectorAll('pre code').forEach((block) => {
+          if (!block.classList.contains('hljs')) {
+            hljs.highlightElement(block);
+          }
+        });
+      }
     });
   });
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-  setupFadeSections();
-  setupDropdowns();
-  // Fade in hero scroll icon after 1s
-  setTimeout(function() {
-    var scrollIcon = document.querySelector('.hero-scroll-icon');
-    if (scrollIcon) scrollIcon.classList.add('visible');
-  }, 1000);
-});

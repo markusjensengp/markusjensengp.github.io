@@ -3,28 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <title>Best Laid Schemes | Project Details</title>
+    <link rel="icon" href="favicon.ico" />
     <link href="style.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="main.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <div class="container">
-    <h2 class="section-title">Project Details</h2>
-    <div class="media-section">
-            <img src="images/GestureRecognizerLogo.png" alt="Sample Project Image" class="media-img">
-            <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="Sample Project GIF" class="media-gif">
-        </div>
-        <div class="code-section">
-            <a id="snippet" class="btn">Show Code Example</a>
-            <div class="snippet-content">
-                <pre><code class="language-cpp">
-bool positive(val) {
-    return val > -1;
-}
-                </code></pre>
+    <div class="sticky-header">
+        <div class="sticky-header-inner">
+            <div class="header-left">
+                <a href="index.html#projects" class="btn">Return to Main Page</a>
+            </div>
+            <div class="header-right">
+                <a href="recognizer.html" class="btn" title="Previous Project">&#8592; Previous</a>
+                <a href="deliveratallcosts.html" class="btn" title="Next Project">Next &#8594;</a>
             </div>
         </div>
-        <a href="index.html#projects" class="btn">Back to Portfolio</a>
     </div>
-    <script src="main.js"></script>
+    <div class="container">
+        <h2 class="section-title" style="margin-bottom: 0;">Best Laid Schemes</h2>
+        <div class="project-layout">
+            <div class="project-image-col">
+                <img src="images/BestLaidSchemesPoster.png" alt="Best Laid Schemes Poster" class="project-main-img" />
+            </div>
+            <div class="project-info-col">
+                <h3>Project Info</h3>
+                <ul class="project-info-list">
+                    <li><strong>Team Size:</strong> 11</li>
+                    <li><strong>Length:</strong> 6 weeks</li>
+                    <li><strong>Engine:</strong> TenGine (In-house)</li>
+                    <li><strong>Platform:</strong> PS5</li>
+                </ul>
+            </div>
+            <div class="project-summary-col">
+                <h3>Summary</h3>
+                <p>Best Laid Schemes is an isometric turn-based stealth game where the player is in control of three heist-ready 
+                    animal characters, entrusted to steal back a prized possession by their crime boss.</p>
+            </div>
+        </div>
+        <section class="project-contributions">
+            <h2 class="contribution-headline">Gameplay</h2>
+            <img src="gifs/BestLaidSchemesGameplay.gif" alt="Best Laid Schemes Gameplay Showcase" class="media-gif" />
+        </section>
+        <section class="project-contributions">
+            <h2 class="contribution-headline">My Contribution</h2>
+            <p class="contribution-text">This was the first project during my time at PlaygroundSquad, and my very first group 
+                project. It was made in our schools in-house engine (TenGine), which gave us some limitations, but also a lot of 
+                opportunities to learn.
+                <br><br>As we were only 3 programmers in our group and everything had to be built from the ground up, we all had 
+                specified tasks to do, but I also aquired the role of generalist since all of us needed help to finish everything 
+                in our short timeframe.
+                <br><br>My main focus was making the characters; enemies and players, and the camera controller. But I also 
+                contributed in our pathfinding, animations, and gameloop system.</p>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Camera Controller</h3>
+            <p class="contribution-text">The camera controller is quite simple. It's an orthographic camera with functions to zoom, move up, down, 
+                left and right, and rotate around the vertical axis.</p> 
+            <img src="gifs/BestLaidSchemesCamera.gif" alt="Best Laid Schemes Camera Showcase" class="media-gif" />
+            <p class="contribution-text">For input I simply store actions on an input mask and read from this in update.</p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+// Add action
+m_input.action_mask |= actionFromKey( _event.event.gamepad.button_id );
+
+// Remove action
+m_input.action_mask &= ~actionFromKey( _event.event.gamepad.button_id );     
+
+// Read input mask
+inline bool isActing( const sInput::eAction _action ) const 
+{ 
+    return ( m_input.action_mask & _action ) ? true : false; 
+}
+                    </code></pre>
+                </div>
+            </div>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Characters</h3>
+            <p class="contribution-text">I decided to create a base class for a character that the player and enemy class would derive 
+                from, to simplify things and not have to rewrite code that they would both need. This includes character state, a move 
+                function, a blend function for animations, and all the variables they would both need, such as model, animations, 
+                position and such.</p>
+            <h3 style="margin-bottom: 0;">Players</h3>
+            <p class="contribution-text">I implemented a way to choose on tiles by shooting a raycast from the camera center. Since this 
+                project was meant for PS5 only, the controls were designed with a controller in mind, and the tile chosen would be the 
+                one in the middle of the screen. 
+                <br>The intersection point gets translated into grid coordinates and is then stored with an A* path between the player and 
+                the point in the player character's selected path.</p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+// Find a path using an A* pathfinding algorithm
+m_character_moves = m_map->searchPath( { ( int ) tg::MathCE::round( m_pos.x / m_map->m_spacing ), 
+                                         ( int ) tg::MathCE::round( m_pos.y / m_map->m_spacing ) }, 
+                                         pickTile( m_aim_line ) );
+                    </code></pre>
+                </div>
+            </div>
+            <p class="contribution-text">I also implemented a state handler with cases for Caught, Idle, Walking, Getting Caught, 
+                and Interacting states. This was done with a simple switch statement that checks the current state and updates the character's 
+                animation, position, and next state accordingly.</p>
+                <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+case cCharacter::WALKING:
+    {
+        // Walking animations varied in walking speed
+        // Check for all 3 players to multiply correctly
+        if( m_name == "ricky" )
+            m_walk_interpolator->addTime( _delta_time * 2, true, true );
+        else if( m_name == "algott" )
+            m_walk_interpolator->addTime( _delta_time * 1.5f, true, true );
+        else if( m_name == "al" )
+            m_walk_interpolator->addTime( _delta_time * 3, true, true );
+
+        m_prev_interpolator = m_next_interpolator;
+        m_next_interpolator = m_walk_interpolator;
+
+        // Make player walk
+        walk( _delta_time );
+
+        // Check if destination is reached or if player has not moved
+        if( m_character_moves.empty() || m_tiles_moved + 1 == m_character_moves.size() )
+        {
+            // Set state to idle and reset move related variables
+            m_current_state   = IDLE;
+            m_finished_moves  = true;
+            m_path_selected   = false;
+            m_character_moves = { };
+            m_tiles_moved     = 0;
+        }
+        break;
+    }
+                    </code></pre>
+                </div>
+            </div>
+            <h3 style="margin-bottom: 0;">Enemies</h3>
+            <p class="contribution-text">For the enemy, I had to implement a very simple AI instead of path choosing to make them 
+                patrol through pseudo random routes. For this, I chose to have a predetermined set of guards with all patrol points 
+                already made out, and make them patrol between them. But when they reach a point, a random one is chosen, so the 
+                player doesn't know where the guard will go if they have played a couple of rounds.</p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+case cCharacter::WALKING:
+    {
+        m_walk_interpolator->addTime( _delta_time, true, true );
+        m_prev_interpolator = m_next_interpolator;
+        m_next_interpolator = m_walk_interpolator;
+        walk( _delta_time );
+        if( m_character_moves.empty() || m_tiles_moved + 1 == m_character_moves.size() )
+        {
+            // Choose next path randomly
+            m_character_moves = m_map->searchPath( 
+                { ( int )tg::MathCE::round( m_pos.x / m_map->m_spacing ), 
+                  ( int )tg::MathCE::round( m_pos.y / m_map->m_spacing ) }, 
+                  m_patrol_points[ rand() % m_patrol_points.size() ] );
+            m_tiles_moved = 0;
+        }
+        break;
+    }
+                    </code></pre>
+                </div>
+            </div>
+            <p class="contribution-text">To be able to catch a player, the enemy needed vision. My solution to this was to get a line between
+                the enemy and player, check if the line is shorter than the guards vision range, then check that there are no walls intersecting
+                the line, and lastly if the angle between the enemy's forward and this line is smaller than the guards vision angle. If all
+                these checks pass, the player is considered caught.</p>
+            </p>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Conclusion</h3>
+            <p class="contribution-text">Since this project was my first ever group project, I have learned a lot from it. I've learned the 
+                basics of creating a game in a group, how to coordinate and help each other, and the overall idea of how to develop a game. 
+                The project was also made with our schools in-house engine, where we had to build every system, feature, mechanic and so on, 
+                from the ground up, all without any documentation. This was very challenging for a small group of fairly new programmers, 
+                but also a very giving experience since we completed the challenges and finished our game in the short timeframe.
+                <br><br>Because of the limited amount of time, we had to make some compromises and cut a few ideas, which was sad during 
+                development since we all wanted to make all of our ideas, but in hindsight, it was a very usefull skill to learn.</p>
+        </section>
+        <footer class="footer-contact">
+            <a></a>
+        </footer>
+    </div>
 </body>
 </html>

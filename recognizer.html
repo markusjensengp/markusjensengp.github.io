@@ -2,29 +2,349 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Recognizer | Project Details</title>
+    <title>Gesture Recognizer | Project Details</title>
+    <link rel="icon" href="favicon.ico" />
     <link href="style.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="main.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <div class="container">
-    <h2 class="section-title">Project Details</h2>
-    <div class="media-section">
-            <img src="images/GestureRecognizerLogo.png" alt="Sample Project Image" class="media-img">
-            <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="Sample Project GIF" class="media-gif">
-        </div>
-        <div class="code-section">
-            <a id="snippet" class="btn">Show Code Example</a>
-            <div class="snippet-content">
-                <pre><code class="language-cpp">
-bool positive(val) {
-    return val > -1;
-}
-                </code></pre>
+    <div class="sticky-header">
+        <div class="sticky-header-inner">
+            <div class="header-left">
+                <a href="index.html#projects" class="btn">Return to Main Page</a>
+            </div>
+            <div class="header-right">
+                <a href="driveback.html" class="btn" title="Previous Project">&#8592; Previous</a>
+                <a href="bestlaidschemes.html" class="btn" title="Next Project">Next &#8594;</a>
             </div>
         </div>
-        <a href="index.html#projects" class="btn">Back to Portfolio</a>
     </div>
-    <script src="main.js"></script>
+    <div class="container">
+        <h2 class="section-title" style="margin-bottom: 0;">Gesture Recognizer</h2>
+        <div class="project-layout">
+            <div class="project-image-col">
+                <img src="images/GestureRecognizerPoster.png" alt="Gesture Recognizer Poster" class="project-main-img" />
+            </div>
+            <div class="project-info-col">
+                <h3>Project Info</h3>
+                <ul class="project-info-list">
+                    <li><strong>Team Size:</strong> 1</li>
+                    <li><strong>Length:</strong> 4 weeks</li>
+                    <li><strong>Engine:</strong> Unreal Engine 5</li>
+                    <li><strong>Platform:</strong> PC</li>
+                </ul>
+            </div>
+            <div class="project-summary-col">
+                <h3>Summary</h3>
+                <p>I have made a multistroke gesture recognizing algorithm, using the $1 unistroke recognizing algorithm as a base.
+                    Capable of recognizing shapes drawn in any rotation and size.
+                </p>
+            </div>
+        </div>
+        <section class="project-contributions">
+            <h2 class="contribution-headline">Showcase</h2>
+            <img src="gifs/GestureRecognizerShowcase.gif" alt="Gesture Recognizer Showcase" class="media-gif" />
+        </section>
+        <section class="project-contributions">
+            <h2 class="contribution-headline">My Solution</h2>
+            <p class="contribution-text">I have created an algorithm for resizing and resampling shapes into a set number 
+                of points so the recognizing algorithm takes in two similar shapes, and then compares all points in both shapes 
+                to find the template with the shortest distance between all points. And adapted the algorithm to work with 
+                multiple strokes.</p>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Resampling process</h3>
+            <p class="contribution-text">To resample the array into the given number of points (sampling_resolution), I find the 
+                total path length by sequentially adding the euclidean distance between the points, and then devide this by 
+                sampling_resolution - 1, to get the interval length. Then I add points by interpolating new points along the path 
+                defined by the original points, ensuring that the new set of points is evenly spaced along the path.</p>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Scale and Translate</h3>
+            <p class="contribution-text">When the shape is resampled to the given number of points, it needs to get scaled and 
+                translated to match size and position with the template shapes. 
+                <br>This was done by finding the bounding box of the shape and use the maximum dimension to scale the shape to a 1x1 box. </p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+void Gesture::Scale( TArray< FMyPoint >& points )
+{
+    float min_x = FLT_MAX, min_y = FLT_MAX;
+    float max_x = FLT_MIN, max_y = FLT_MIN;
+
+    for( int i = 0; i < points.Num(); i++ )
+    {
+        if( min_x > points[ i ].m_point.X ) min_x = points[ i ].m_point.X;
+        if( min_y > points[ i ].m_point.Y ) min_y = points[ i ].m_point.Y;
+        if( max_x < points[ i ].m_point.X ) max_x = points[ i ].m_point.X;
+        if( max_y < points[ i ].m_point.Y ) max_y = points[ i ].m_point.Y;
+    }
+
+    const float scale = FMath::Max( max_x - min_x, max_y - min_y );
+
+    TArray< FMyPoint > old_points = points;
+    points.Empty();
+
+    for( int i = 0; i < old_points.Num(); i++ )
+    {
+        points.Add( FMyPoint( FVector2D( 
+            ( old_points[ i ].m_point.X - min_x ) / scale, 
+            ( old_points[ i ].m_point.Y - min_y ) / scale ),
+            old_points[ i ].m_stroke_id ) );
+    }
+}
+                    </code></pre>
+                </div>
+            </div>
+            <p class="contribution-text">Then to translate the shape so the center of it is at the origin (0, 0), I find 
+                the centroid by averaging the positions of all points in the shape.</p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+FMyPoint Gesture::Centroid( TArray< FMyPoint >& points )
+{
+    float centroid_x = 0.0f, centroid_y = 0.0f;
+
+    for( int i = 0; i < points.Num(); i++ )
+    {
+        centroid_x += points[ i ].m_point.X;
+        centroid_y += points[ i ].m_point.Y;
+    }
+
+    return FMyPoint( FVector2D( centroid_x / points.Num(), centroid_y / points.Num() ), 0 );
+}
+                    </code></pre>
+                </div>
+            </div>
+            <p class="contribution-text">And then translate the shape by subtracting the centroid from each point.</p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+void Gesture::TranslateTo( TArray< FMyPoint >& points, FMyPoint centroid )
+{
+    TArray< FMyPoint > old_points = points;
+    points.Empty();
+
+    for( int i = 0; i < old_points.Num(); i++ )
+    {
+        points.Add( FMyPoint(
+            FVector2D( old_points[ i ].m_point.X - centroid.m_point.X, old_points[ i ].m_point.Y - centroid.m_point.Y ),
+            old_points[ i ].m_stroke_id ) );
+    }
+}
+                    </code></pre>
+                </div>
+            </div>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Recognition</h3>
+            <p class="contribution-text">
+                The recognition algorithm compares the drawn shape to each stored template. Since users can draw gestures at any 
+                angle, the algorithm uses the function <b>DistanceAtBestAngle</b>, which rotates the gesture and checks how well 
+                it matches the template at different angles. At each angle, it calculates a similarity score based on point distances.
+            </p>
+            <p class="contribution-text">
+                The point comparison happens in <b>PathDistance</b>, which goes through each point in the user's gesture and finds the 
+                closest unmatched point in the template. 
+            </p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+float Recognizer::PathDistance( const TArray< FMyPoint >& path_a, const TArray< FMyPoint >& path_b )
+{
+    ...
+
+    float sum = 0.0f;
+    for( int i = 0; i < n; i++ )
+    {
+        int index = -1;
+        float min_distance = FLT_MAX;
+
+        for( int j = 0; j < n; j++ )
+        {
+            if( !matched[ j ] )
+            {
+                const float distance = Gesture::Distance( path_a[ i ], path_b[ j ] );
+                if( distance < min_distance )
+                {
+                    min_distance = distance;
+                    index = j;
+                }
+            }
+        }
+
+        matched[ index ] = true;
+        sum += min_distance;
+    }
+    
+    ...
+}
+                    </code></pre>
+                </div>
+            </div>
+            <p class="contribution-text">
+                Instead of rotating through every possible angle, I implemented a golden section search to efficiently find
+                the best one. This search focuses only on the most promising angles and keeps narrowing the range based on which side has 
+                the lower distance. At each step, the gesture is rotated and compared.
+            </p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+void Recognizer::GoldenSectionSearch( const float& a, const float& b, 
+                                      const TArray< FMyPoint >& candidate_points,
+                                      const TArray< FMyPoint >& template_points, 
+                                      float& x, float& f )
+{
+    // Next angle by the golden section ratio
+    x = phi * a + ( 1.0 - phi ) * b;
+    f = DistanceAtAngle( candidate_points, template_points, x );
+}
+                    </code></pre>
+                </div>
+            </div>
+            <p class="contribution-text">
+            This search continues until the angle range is smaller than a set precision value, and the minimum distance found is kept for comparison.
+            </p>
+            <p class="contribution-text">
+            After going through all templates, the one with the smallest distance is selected as the best match. But smallest distance 
+            doesn't mean it's a match, so a precision score is calculated. If the score is too low, it returns a message saying no spell was matched. 
+            Otherwise, it returns the name of the template that best fits the drawn gesture.
+            </p>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Painting and Saving</h3>
+            <p class="contribution-text">
+                To allow the player to draw gestures, I built a custom painting widget that runs during the player's Tick and collects all the points 
+                they draw in real time. The widget checks if the player is currently painting, if so, it retrieves the current mouse 
+                position, scales it based on viewport, and adds the point to the internal list if it's different from the last one.
+            </p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+FVector2d mouse_pos;
+GEngine->GameViewport->GetMousePosition( mouse_pos );
+
+const FVector2D viewport_size = FVector2D( GEngine->GameViewport->Viewport->GetSizeXY() );
+const float viewport_scale = GetDefault< UUserInterfaceSettings >( UUserInterfaceSettings::StaticClass() )->
+    GetDPIScaleBasedOnSize( FIntPoint( viewport_size.X, viewport_size.Y ) );
+const FVector2D scaled_point = mouse_pos / viewport_scale;
+
+const FVector2D last_point = points.Num() > 0 ? points.Last().m_point : scaled_point;
+const bool is_new_point = !last_point.Equals( scaled_point, 1.0f );
+
+if( points.Num() == 0 || is_new_point )
+{
+    m_painting_widget->AddPoint( FMyPoint( scaled_point, m_stroke ) );
+}
+                    </code></pre>
+                </div>
+            </div>
+            <p class="contribution-text">
+                To save shapes as templates, I made a training widget that interacts with the painting widget. If training mode is 
+                enabled the drawn shape is passed into a function that both adds it to the recognizer's internal template list and 
+                saves it to a data table.
+            </p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+void Recognizer::AddTemplate( const FString& name, const TArray< FMyPoint >& points )
+{
+    m_templates.Add( Gesture( points, name ) );
+}
+                    </code></pre>
+                </div>
+            </div>
+            <p class="contribution-text">
+                The actual saving process is done through a function that packages the points and name into a FTemplatesDataTable row, appends it 
+                to the data table, and also updates the recognizer instance with the new shape.
+            </p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+data_row.m_name = Name;
+data_row.m_points = m_painting_widget->GetPoints();
+m_template_table->AddRow( FName( *FString::FromInt( row_num ) ), data_row );
+m_recognizer->AddTemplate( Name, m_painting_widget->GetPoints() );
+                    </code></pre>
+                </div>
+            </div>
+            <p class="contribution-text">
+                When the game starts, all saved templates are loaded back into memory from the data table. The system goes through every row 
+                in the table and re-adds each shape to the recognizer so they're ready to be matched against drawn gestures.
+            </p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+for( int i = 0; i < rows.Num(); i++ )
+    m_recognizer->AddTemplate( rows[ i ]->m_name, rows[ i ]->m_points );
+                    </code></pre>
+                </div>
+            </div>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Pen Stabilization</h3>
+            <p class="contribution-text">I noticed that it could sometimes be hard to draw certain shapes, such as circles or straight lines, 
+                so I implemented a very simple pen stabilizer that takes all points in the current stroke and smoothes them out by averaging 
+                each point's position with the positions of its neighbors.</p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+void ASpellDungeonPlayer::SmoothPoints( TArray< FMyPoint* >& points )
+{
+    TArray< FMyPoint* > old_points = points;
+
+    for( int i = 0; i < old_points.Num(); ++i )
+    {
+        float sum_x = 0.0f;
+        float sum_y = 0.0f;
+        int count = 0;
+
+        // smoothing_window decides how many neighbors to include on each side
+        for( int j = -smoothing_window; j <= smoothing_window; ++j )
+        {
+            const int index = i + j;
+            if( index >= 0 && index < old_points.Num() )
+            {
+                sum_x += old_points[ index ]->m_point.X;
+                sum_y += old_points[ index ]->m_point.Y;
+                count++;
+            }
+        }
+
+        points[ i ]->m_point.X = sum_x / count;
+        points[ i ]->m_point.Y = sum_y / count;
+    }
+}
+                    </code></pre>
+                </div>
+            </div>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Conclusion</h3>
+            <p class="contribution-text">This solo project has taught me more about Unreal Engine and all of it's countless features. 
+                I've learned about widgets as well as data tables and some things about other ways of storing data. My initial goal 
+                with this project was to learn only about gesture recognizing, and making a controller for it. But I have learned much 
+                more about the engine than I thought I would. I have also learned a bit about pen stabilizers and how they work, which 
+                I had no intention of when I first started this project.
+                <br><br>My key takeaway from this project is that projects don't always end up like planned, but you will always learn something, 
+                even if it's not what you thought you would.</p>
+        </section>
+        <footer class="footer-contact">
+            <a></a>
+        </footer>
+    </div>
 </body>
 </html>

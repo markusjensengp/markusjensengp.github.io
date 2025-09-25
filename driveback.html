@@ -3,37 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <title>DriveBack | Project Details</title>
+    <link rel="icon" href="favicon.ico" />
     <link href="style.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/night-owl.min.css " rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="main.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
+    <div class="sticky-header">
+        <div class="sticky-header-inner">
+            <div class="header-left">
+                <a href="index.html#projects" class="btn">Return to Main Page</a>
+            </div>
+            <div class="header-right">
+                <a href="unannounced.html" class="btn" title="Previous Project">&#8592; Previous</a>
+                <a href="recognizer.html" class="btn" title="Next Project">Next &#8594;</a>
+            </div>
+        </div>
+    </div>
     <div class="container">
     <h2 class="section-title" style="margin-bottom: 0;">DriveBack: San Juego</h2>
-    <div class="footer-contact">
-        <div class="footer-btns">
-            <a href="index.html#projects" class="btn" style="margin: 0;">Back to Portfolio</a>
+    <div class="project-layout">
+        <div class="project-image-col">
+            <img src="images/DriveBackSanJuegoPoster.png" alt="DriveBack: San Juego Poster" class="project-main-img" />
+        </div>
+        <div class="project-info-col">
+            <h2 style="color: var(--color-main);">Project Info</h2>
+            <ul class="project-info-list">
+                <li><strong>Role:</strong> Gameplay Programmer</li>
+                <li><strong>Length:</strong> 9 weeks</li>
+                <li><strong>Engine:</strong> Unreal Engine 5</li>
+                <li><strong>Team Size:</strong> 15</li>
+                <li><strong>Platform:</strong> PC & PS5</li>
+            </ul>
+        </div>
+        <div class="project-summary-col">
+            <h2 style="color: var(--color-main);">Summary</h2>
+            <p>DriveBack: San Juego, a 2000's Driver games' inspired driving game, was our second game project at PlaygroundSquad and our 
+                first project in Unreal Engine.<br> You play as an ex getaway driver in a small, fictional spanish coastal city called San 
+                Juego, where you drive multiple different cars and weave through traffic, avoiding police cars that chase you while racing 
+                against the clock.</p>
         </div>
     </div>
-    <div class="media-section">
-            <img src="images/GestureRecognizerLogo.png" alt="Sample Project Image" class="media-img">
-            <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="Sample Project GIF" class="media-gif">
-        </div>
-        <div class="code-section">
-            <a id="snippet" class="btn">Show Code Example</a>
-            <div class="snippet-content">
-                <pre><code class="language-cpp">
-bool positive(val) {
-    return val > -1;
+    <div>
+        <section class="project-contributions">
+            <h2 class="contribution-headline">Gameplay</h2>
+            <img src="gifs/DriveBackSanJuegoGameplay.gif" alt="DriveBack: San Juego Gameplay Showcase" class="media-gif" />
+        </section>
+        <section class="project-contributions">
+            <h2 class="contribution-headline">My Contribution</h2>
+            <p class="contribution-text">The larger team size and a more advanced game engine, compared to our previous school project, 
+                allowed me to focus on gameplay programming and on one specific aspect of the game. And I had the opportunity to focus 
+                on the car controller for the entirety of the project.<br> My car controller is a physically simulated car controller 
+                with arcade vehicle features, with many adjustable variables and components to enable the user to modify their car in 
+                almost any way they want.</p>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Car Controller</h3>
+            <p class="contribution-text">Since my only responsibility was the car controller, I had time to continue evolving it once I had
+                completed the feature I was previously working on. Therefore there are a lot of features added to the car controller, 
+                considering the timeframe we had, including:</p>
+            <ul style="color: var(--color-text); font-size: 1.1rem; text-align: left;">
+            <li>Realistic suspension using UE5 physics constraints</li>
+            <li>Gearbox simulation with adjustable gear ratios</li>
+            <li>Adjustable automatic gearbox</li>
+            <li>Adjustable engines (max/min RPM, torque curve)</li>
+            <li>Torque output as a function of RPM</li>
+            <li>Engine RPM depending on wheel rotation</li>
+            <li>Anti-roll bars with adjustable stiffness</li>
+            <li>Togglable ABS</li>
+            <li>Adjustable traction control</li>
+            <li>Differential gear ratio</li>
+            <li>Selectable drivetrain (RWD, FWD, AWD)</li>
+            <li>Gameplay affecting damage</li>
+            </ul>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Realistic Suspension Using UE5 Physics Constraints</h3>
+            <p class="contribution-text">Using Unreal Engine 5's physics constraints to set up suspension allowed me to create a fairly 
+                realistic suspension setup with two physics constraints for each wheel, that had lots of tunability. One to connect 
+                a wheel hub to the body so the hub and wheel can travel up and down. And one to connect the wheel to the hub so the 
+                wheel can spin.</p>
+            <img src="gifs/DriveBackSanJuegoSuspension.gif" alt="DriveBack: San Juego Suspension Showcase" class="media-gif" />
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Gearbox Simulation With Adjustable Gear Ratios</h3>
+            <p class="contribution-text">Gear ratios are handled by an array 'GearRatios', and are used both ways to calculate engine RPM or torque.</p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+TargetRPM = ConnectedWheelRPM * AxleRatio * GearRatios[ CurrentGear ];
+                    </code></pre>
+                </div>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Adjustable Automatic Gearbox</h3>
+            <p class="contribution-text">Shift up and down RPM values, as well as the time between gear shifts, are managed by the 
+                variables ShiftUpRPM, ShiftDownRPM, and TimeBetweenGears. The code checks the current RPM and initiates a gear 
+                shift if necessary.</p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+// Shift up
+if( CurrentRPM >= ShiftUpRPM && 
+    CurrentGear < 5 && 
+    CurrentGear > 0 && 
+    abs( ConnectedWheelRPM / 60.0f * KMHperWheelRPS - VehicleSpeed ) < 5.0f )
+{
+    ShiftGears( 1 );
+    return;
 }
-                </code></pre>
+// Shift down
+if( CurrentRPM < ShiftDownRPM && CurrentGear > 1 )
+    ShiftGears( -1 );
+// Shift to neutral
+if( ConnectedWheelRPM < 5.0f && CurrentGear != 0 && !ThrottleValue )
+    ShiftGears( -CurrentGear );
+
+// Shifting
+ShiftingTimer += DeltaTime;
+if( ShiftingTimer > TimeBetweenGears )
+{
+    CurrentGear = NextGear;
+    ShiftingGears = false;
+}
+                    </code></pre>
+                </div>
             </div>
-        </div>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Adjustable Engines</h3>
+            <p class="contribution-text">To ensure that the engine RPM does not get unrealistically high or low, variables MaxRPM 
+                and IdleRPM were added for easy adjustments. The torque curve was also added as a UPROPERTY for easy adjustments.</p>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Torque Output As A Function Of RPM</h3>
+            <p class="contribution-text">The torque applied to the wheels depends on the current RPM, which is determined by the 
+                torque curve, multiplied by gear and axle ratios.</p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+CurrentTorque = TorqueCurve->GetFloatValue( CurrentRPM ) * 
+    GearRatios[ CurrentGear ] * AxleRatio * ThrottleValue;
+                    </code></pre>
+                </div>
+            </div>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Engine RPM Depending On Wheel Rotation</h3>
+            <p class="contribution-text">The RPM is calculated based on the angular velocity of the fastest spinning connected wheel, 
+                and gear ratios in the EngineBrake function.</p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+ConnectedWheelRPM = 0.0f;
+
+switch ( DriveTrain )
+{
+    ...
+    case EDriveTrain::RWD:
+    {
+        const float RLAngVel = abs( UKismetMathLibrary::InverseTransformDirection( WheelRL->GetComponentTransform(), 
+                                    WheelRL->GetPhysicsAngularVelocityInDegrees() ).Y ) / 360.0f * 60.0f;
+        const float RRAngVel = abs( UKismetMathLibrary::InverseTransformDirection( WheelRR->GetComponentTransform(), 
+                                    WheelRR->GetPhysicsAngularVelocityInDegrees() ).Y ) / 360.0f * 60.0f;
+        
+        // Sets ConnectedWheelRPM to the highest value, RLAngVel or RRAngVel
+        ConnectedWheelRPM = FMath::Max(RLAngVel, RRAngVel);
+        break;
+    }
+    ...
+}
+
+TargetRPM = ConnectedWheelRPM * AxleRatio * GearRatios[ CurrentGear ];
+                    </code></pre>
+                </div>
+            </div>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Anti-Roll Bars With Adjustable Stiffness</h3>
+            <p class="contribution-text">The anti-roll bars are designed to counteract body roll during cornering by balancing the 
+                forces between the left and right suspension components. The code compares the forces on the left and right sides for 
+                both the front and rear suspensions. If the force on one side is less than its counterpart on the opposite side, it 
+                adjusts the force by multiplying the counterpart's force with a stiffness factor (ranging from 0 to 1). This helps 
+                even out the suspension force and reduces body roll.</p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+void APlayerCar::HandleBodyRoll()
+{
+    SuspensionFL->GetConstraint().Get()->GetConstraintForce( SuspForceFL, SuspAngForceFL );
+    SuspensionFR->GetConstraint().Get()->GetConstraintForce( SuspForceFR, SuspAngForceFR );
+    SuspensionFL->GetConstraint().Get()->GetConstraintForce( SuspForceRL, SuspAngForceRL );
+    SuspensionFR->GetConstraint().Get()->GetConstraintForce( SuspForceRR, SuspAngForceRR );
+
+    // If right or left suspension force is less than its counterpart, 
+    // set this force to its counterparts multiplied by 0-1 (stiffness) 
+    // to even out suspension force and counter body roll
+
+    if( SuspForceFL.Z < SuspForceFR.Z )
+        SuspForceFL = SuspForceFR * FrontRollBarStiffness;
+    else if( SuspForceFR.Z < SuspForceFL.Z )
+        SuspForceFR = SuspForceFL * FrontRollBarStiffness;
+    
+    if( SuspForceRL.Z < SuspForceRR.Z )
+        SuspForceRL = SuspForceRR * RearRollBarStiffness;
+    else if( SuspForceRR.Z < SuspForceRL.Z )
+        SuspForceRR = SuspForceRL * RearRollBarStiffness;
+}
+                    </code></pre>
+                </div>
+            </div>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Togglable ABS</h3>
+            <p class="contribution-text">The ABS can be toggled through a variable. When the throttle value is negative (braking) 
+                and ABS is enabled, a function checks if the difference between the connected wheel RPM and the vehicle travel speed 
+                is significant. If it is, the braking force is applied. If not, the braking force stays as it is to prevent wheel lock-up.</p>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Adjustable Traction Control</h3>
+            <p class="contribution-text">Traction control is handled in the throttle logic. The code compares the connected wheel RPM 
+                with the vehicle speed, and if the difference exceeds a set limit, torque is not applied to the wheels.</p>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Selectable Drivetrain</h3>
+            <p class="contribution-text">Selecting drivetrain is easily done with the variable DriveTrain through Blueprints.</p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+void APlayerCar::ApplyTorque()
+{
+    ...
+
+    switch ( DriveTrain )
+    {
+    case EDriveTrain::AWD:
+        {
+            // Multiplies torque by 0.45 for the front wheels and 0.55 for the rear to distribute
+            // torque for all wheels
+            WheelFL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                WheelFL->GetComponentTransform(), FVector( 0,  CurrentTorque * 0.45f, 0 ) ), NAME_None, true );
+            
+            ...
+        }
+    case EDriveTrain::RWD:
+        {
+            WheelRL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                WheelRL->GetComponentTransform(), FVector( 0,  CurrentTorque, 0 ) ), NAME_None, true );
+           
+            ...
+        }
+    case EDriveTrain::FWD:
+        {
+            WheelFL->AddTorqueInDegrees( UKismetMathLibrary::TransformDirection( 
+                WheelFL->GetComponentTransform(), FVector( 0,  CurrentTorque, 0 ) ), NAME_None, true );
+            
+            ...
+        }
+    }
+}
+                    </code></pre>
+                </div>
+            </div>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Gameplay Affecting Damage</h3>
+            <p class="contribution-text">Using a team members visual damage component, damage is applied to the wheels depending on 
+                what part of the car is damaged</p>
+            <div class="code-section">
+                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
+                <div class="snippet-content" id="snippet-content">
+                    <pre><code class="language-cpp">
+// DamageThreshold is a UPROPERTY to limit when wheels start taking damage
+if( CRoot->m_health_hood_L < DamageThreshold ) 
+    WheelDmgRotFL += MaxDamageAngle * ( ( 100.0f - CRoot->m_health_hood_L ) / 100.0f );
+
+DamageSinValue += DeltaTime * VehicleSpeed;
+
+// Adds or subtracts damage to create a wobbling effect
+if( WheelDmgRotFL )
+    WheelDmgRotFL += WobbleValue * sin( DamageSinValue ) * abs( WheelDmgRotFL / MaxDamageAngle ) ;
+
+// Handled in HandleSteering function
+SuspensionFL->SetAngularOrientationTarget( FRotator( 0, Angle + WheelDmgRotFL, 0 ) );
+                    </code></pre>
+                </div>
+            </div>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Conclusion</h3>
+            <p class="contribution-text">This project has given me so much. Since this was my first real project in Unreal Engine, I
+                had to firstly learn about the engine itself and how I can use it to my advantage, both the very simple essentials as 
+                well as the complex and advanced features. Then I was completely in charge of creating a whole car controller, which 
+                was something that I had never done anything remotely close to. It has been a big challange for me, from start to end, 
+                but the whole journey has been educational for me and I have gained so many useful skills throughout this project.
+                <br><br>I used to have a pretty focused path when creating my code, since almost all of my previous projects and features 
+                have been my idea where I already had an approach to a solution made up. But for this project I had no idea what I was 
+                coming into and how it would end up, so my code had to be pretty flexible in case my controller didn't satisfy the 
+                group, which did happen. This has shown to be a very useful skill that I gained from this project.</p>
+        </section>
         <footer class="footer-contact">
-            <div class="footer-btns">
-                <a href="index.html#projects" class="btn">Back to Portfolio</a>
-            </div>
+            <a></a>
         </footer>
     </div>
-    <script src="main.js"></script>
+    </div>
 </body>
 </html>
