@@ -7,7 +7,7 @@
   --color-bg: #111111;
   --color-bg-a: rgb(17, 17, 17, 0.98);
   --color-bg-secondary: #252525;
-  --color-main: #f8d4ff;
+  --color-main: #d6c6e4;
   --color-hovered: #ffffff;
 }
 
@@ -788,6 +788,10 @@ pre {
     margin-bottom: 1.2rem;
   }
 
+  .section-title {
+    font-size: 3.2rem;
+  }
+
   /* Sticky header responsiveness */
   .sticky-header .header-left,
   .sticky-header .header-right {
@@ -838,6 +842,10 @@ pre {
     justify-content: center;
   }
 
+  .sticky-header-inner{
+    padding: 0 10px;
+  }
+  
   .sticky-header {
     padding: 0.15rem 0.2rem;
   }

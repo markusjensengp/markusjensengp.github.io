@@ -31,54 +31,67 @@
             <div class="project-info-col">
                 <h3>Project Info</h3>
                 <ul class="project-info-list">
-                    <li><strong>Length:</strong> 6 months</li>
+                    <li><strong>Length:</strong> ~2 months</li>
                     <li><strong>Engine:</strong> Unity</li>
-                    <li><strong>Team Size:</strong> 10</li>
+                    <li><strong>Platform:</strong> PC, PS5, Xbox Series S & X</li>
                 </ul>
             </div>
             <div class="project-summary-col">
                 <h3>Summary</h3>
-                <p>Deliver At All Costs is a thrilling action game where destruction, absurdity and intrigue collide! I worked as a programming intern at Far Out Games, fixing various features and bugs.</p>
+                <p>Deliver At All Costs is a thrilling action game where destruction, absurdity and intrigue collide! I worked as a 
+                    programming intern at Far Out Games, fixing various features and bugs.
+                    <br><br> Watch the trailer <a href="https://www.youtube.com/watch?v=OXpxUAkgjGs" target="_blank" style="color: var(--color-main);">here</a>.</p>
             </div>
         </div>
         <section class="project-contributions">
             <h2 class="contribution-headline">My Contribution</h2>
-            <p class="contribution-text">Describe your main role and responsibilities here.</p>
+            <p class="contribution-text">I joined Far Out Games as an intern during the last few months of development on this title.
+                The main focus at this stage was on polishing the game, which involved fixing bugs and improving existing gameplay mechanics. 
+                Because of this, I unfortunately had limited opportunities for creative input, but still had the chance to contribute to the 
+                project. I got to work on most of the game's core systems, both completing assigned tasks and suggesting improvements.</p>
         </section>
         <section class="project-contributions">
-            <h3 class="contribution-headline">Contribution 1</h3>
-            <p class="contribution-text">Detail a specific contribution or feature you worked on.</p>
+            <h3 class="contribution-headline">Bug Fixing</h3>
+            <p class="contribution-text">My assigned tasks were diverse and allowed me to work on most of the game's systems, learning 
+                about the codebase and overall structure while contributing to the project and learning the engine. From this, I gained 
+                valuable experience in both debugging and how to join a team effectively, as well as improving my problem-solving skills.</p>
+            <p class="contribution-text">The bugs I worked on ranged from simple null reference exceptions, input handling issues, or sound 
+                effect issues, to more complex problems like mission-related issues.</p>
+        </section>
+        <section class="project-contributions">
+            <h3 class="contribution-headline">Feature Improvements</h3>
+            <p class="contribution-text">A feature that I worked on was an obtainable upgrade to the player car, more specifically the jet 
+                engine upgrade. This upgrade allowed players to boost their speed and fly through the streets. It was designed to 
+                give the player a shorter boost of speed, but it was a slight issue with it.
+                <img src="gifs/JetEngine.gif" alt="Jet Engine Upgrade" class="media-gif">
+                <br>After playtesting the upgrade, I found that it was quite easy to use the boost in order to propell yourself upwards, 
+                reaching places that were not intended to be reached. To fix this, I limit boost depending on the car's upwards angle, ensuring 
+                that players could still use it to gain speed without flying into unintended areas.</p>
             <div class="code-section">
                 <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
                 <div class="snippet-content" id="snippet-content">
                     <pre><code class="language-cpp">
-// Example feature fix
-void FixFeature() {
-    // ...bug fix code...
-}
+float scalar = Vector3.Dot(carForward.XZ().normalized, carForward);
+m_playerCarRigidBody.AddForce(carForward * (m_power * falloff * scalar), ForceMode.Acceleration);
                     </code></pre>
                 </div>
             </div>
-        </section>
-        <section class="project-contributions">
-            <h3 class="contribution-headline">Contribution 2</h3>
-            <p class="contribution-text">Detail another contribution or aspect you handled.</p>
-            <div class="code-section">
-                <a id="snippet" aria-expanded="false" aria-controls="snippet-content">View Snippet</a>
-                <div class="snippet-content" id="snippet-content">
-                    <pre><code class="language-cpp">
-// ...existing code...
-void FixFeature() {
-    // ...bug fix code...
-}
-// ...existing code...
-                    </code></pre>
-                </div>
-            </div>
+            <p class="contribution-text">Another issue with this upgrade was the speed, it was simply too fast. So I was tasked with adding a 
+                top speed without affecting the boost acceleration or duration. This was solved by adding a force that counteracted the boost 
+                force when the car reached a certain speed.
+            </p>
         </section>
         <section class="project-contributions">
             <h3 class="contribution-headline">Conclusion</h3>
-            <p class="contribution-text">Summarize the impact or outcome of your work on this project.</p>
+            <p class="contribution-text">This project was my first experience working on a professional project and it has been such a valuable
+                experience for me. I had the opportunity to work with a team of great developers and learn from them. Things like how a professional
+                or larger project can be structured, and the how game engine works since this was my first project using Unity. But I also had the 
+                opportunity to contribute to the project with my own ideas and improvements, and got valuable feedback on my work which helped me greatly.
+                <br>While getting into the project's structure and codebase, I also learned how to effectively join and navigate a larger project, and 
+                how to adapt to the team's workflows and standards, which are great skills to have.
+                <br>Working with Far Out Games has been a great experience and I am very grateful for the opportunity to work with them. And I have 
+                grown both as a team member and as a programmer during this internship.
+            </p>
         </section>
         <footer class="footer-contact">
             <a></a>
