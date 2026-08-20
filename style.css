@@ -132,7 +132,7 @@ body::after {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  min-height: 60vh;
+  /* min-height: 60vh; */
   text-align: left;
   padding: 2rem 0 8rem 0;
   gap: 2.5rem;
@@ -210,7 +210,7 @@ body::after {
 .projects-section {
   scroll-margin-top: 100px;
   background: none;
-  margin-top: 3rem;
+  margin-bottom: 3rem;
 }
 
 .section-title {
